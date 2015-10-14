@@ -1,0 +1,4 @@
+.*.swp
+/sim/*
+!/sim/*/*.mpf
+!/sim/*/*.do
