@@ -40,7 +40,7 @@ begin
     generic map
     (
         ACCUM_BITS_N        => 32,
-        TUNING_WORD_N       => 22
+        TUNING_WORD_N       => TUNING_WORD_N
     )
     port map
     (
