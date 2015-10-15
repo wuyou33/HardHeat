@@ -1,4 +1,8 @@
 .*.swp
-/sim/*
-!/sim/*/*.mpf
-!/sim/*/*.do
+
+# Exclude everything in the sim folder except project files and scripts
+sim/*
+!sim/*
+sim/*/*
+!sim/*/*.mpf
+!sim/*/*.do
