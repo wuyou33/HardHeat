@@ -45,8 +45,11 @@ begin
             else
                 off := '0';
             end if;
-            sig_out <= sig_in xor (sig_in and off);
-            sig_n_out <= (not sig_in) xor (not sig_in and off);
+            if sig_in = '1' then
+                sig_out <= off;
+            else
+                sig_n_out <= off;
+            end if;
             last_state := sig_in;
         end if;
     end process;
