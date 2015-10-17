@@ -2,7 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
--- use work.deadtime_gen_pkg.all;
 use work.epdm_pkg.all;
 use work.phase_accumulator_pkg.all;
 
@@ -23,6 +22,10 @@ architecture epdm_tb_arch of epdm_tb is
     signal sig              : std_logic;
     signal mod_lvl          : unsigned(2 downto 0);
     signal mod_lvl_f        : std_logic;
+    signal sig_lh           : std_logic;
+    signal sig_ll           : std_logic;
+    signal sig_rh           : std_logic;
+    signal sig_rl           : std_logic;
 
 begin
 
@@ -33,7 +36,11 @@ begin
         reset               => reset,
         mod_lvl_in          => mod_lvl,
         mod_lvl_in_f        => mod_lvl_f,
-        sig_in              => sig
+        sig_in              => sig,
+        sig_lh_out          => sig_lh,
+        sig_ll_out          => sig_ll,
+        sig_rh_out          => sig_rh,
+        sig_rl_out          => sig_rl
     );
 
     sig_gen_p: phase_accumulator
@@ -90,5 +97,11 @@ begin
             last_state := sig;
         end if;
     end process;
+
+    -- Make sure same side high- and low-side are never on at the same time
+    assert not (sig_lh = sig_ll and sig_lh = '1')
+        report "Left h = l" severity warning;
+    assert not (sig_rh = sig_rl and sig_rh = '1')
+        report "Right h = l" severity warning;
 
 end;
