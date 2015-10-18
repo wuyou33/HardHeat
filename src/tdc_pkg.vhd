@@ -14,7 +14,9 @@ package tdc_pkg is
             reset           : in std_logic;
             up_in           : in std_logic;
             down_in         : in std_logic;
-            time_out        : out signed(COUNTER_N downto 0)
+            time_out        : out signed(COUNTER_N downto 0);
+            sig_or_out      : out std_logic;
+            sign_out        : out std_logic
         );
     end component;
 end package;

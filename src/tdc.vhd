@@ -14,8 +14,10 @@ entity tdc is
         reset           : in std_logic;
         up_in           : in std_logic;
         down_in         : in std_logic;
-        time_out        : out signed(COUNTER_N downto 0)
-    );
+        time_out        : out signed(COUNTER_N downto 0);
+        sig_or_out      : out std_logic;
+        sign_out        : out std_logic
+);
 end tdc;
 
 architecture tdc_arch of tdc is
@@ -27,8 +29,10 @@ begin
     begin
         if reset = '1' then
             sign <= '0';
+            sign_out <= sign;
         elsif rising_edge(down_in) then
             sign <= up_in;
+            sign_out <= sign;
         end if;
     end process;
 
@@ -43,6 +47,7 @@ begin
             last_state := '0';
         elsif rising_edge(clk) then
             sig_or := up_in or down_in;
+            sig_or_out <= sig_or;
             -- Count when the or signal is high, sign comes from flip-flop
             if sig_or = '1' then
                 count := count + 1;

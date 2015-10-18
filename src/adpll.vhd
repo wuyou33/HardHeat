@@ -4,18 +4,20 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.resonant_pfd_pkg.all;
 use work.tdc_pkg.all;
-use work.filter_pkg.all;
+use work.pid_pkg.all;
 use work.phase_accumulator_pkg.all;
 
 entity adpll is
     generic
     (
         COUNTER_N       : positive;
-        ALPHA_SHIFT_N   : natural;
-        BETA_SHIFT_N    : natural;
+        P_SHIFT_N       : natural;
+        I_SHIFT_N       : natural;
         ACCUM_BITS_N    : positive;
         TUNING_WORD_N   : positive;
-        INIT_OUT_VAL    : positive
+        INIT_OUT_VAL    : positive;
+        OUT_OFFSET      : natural;
+        OUT_VAL_LIMIT   : positive
     );
     port
     (
@@ -61,21 +63,23 @@ begin
         time_out        => phase_time
     );
 
-    filter_p: filter
+    filter_p: pid
     generic map
     (
-        ALPHA_SHIFT_N   => ALPHA_SHIFT_N,
-        BETA_SHIFT_N    => BETA_SHIFT_N,
+        P_SHIFT_N       => P_SHIFT_N,
+        I_SHIFT_N       => I_SHIFT_N,
         IN_N            => COUNTER_N,
         OUT_N           => TUNING_WORD_N,
-        INIT_OUT_VAL    => INIT_OUT_VAL
+        INIT_OUT_VAL    => INIT_OUT_VAL,
+        OUT_OFFSET      => OUT_OFFSET,
+        OUT_VAL_LIMIT   => OUT_VAL_LIMIT
     )
     port map
     (
         clk             => ref_in,
         reset           => reset,
-        filt_in         => phase_time,
-        filt_out        => tuning_word
+        pid_in          => phase_time,
+        pid_out         => tuning_word
     );
 
     phase_accumulator_p: phase_accumulator

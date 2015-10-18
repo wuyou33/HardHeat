@@ -6,11 +6,13 @@ package adpll_pkg is
         generic
         (
             COUNTER_N       : positive;
-            ALPHA_SHIFT_N   : natural;
-            BETA_SHIFT_N    : natural;
+            P_SHIFT_N       : natural;
+            I_SHIFT_N       : natural;
             ACCUM_BITS_N    : positive;
             TUNING_WORD_N   : positive;
-            INIT_OUT_VAL    : positive
+            INIT_OUT_VAL    : positive;
+            OUT_OFFSET      : natural;
+            OUT_VAL_LIMIT   : positive
         );
         port
         (
