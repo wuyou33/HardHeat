@@ -50,4 +50,4 @@ begin
         end if;
     end process;
 
-end resonant_pfd_arch;
+end;

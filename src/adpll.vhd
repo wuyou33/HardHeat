@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.resonant_pfd_pkg.all;
 use work.tdc_pkg.all;
-use work.pid_sim_pkg.all;
+use work.pid_pkg.all;
 use work.phase_accumulator_pkg.all;
 
 entity adpll is
@@ -63,7 +63,7 @@ begin
         time_out        => phase_time
     );
 
-    filter_p: pid_sim
+    filter_p: pid
     generic map
     (
         P_SHIFT_N       => P_SHIFT_N,

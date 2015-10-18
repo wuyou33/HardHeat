@@ -8,13 +8,15 @@ entity hardheat_tb is
     generic
     (
         COUNTER_N           : positive      := 12;
-        ALPHA_SHIFT_N       : natural       := 10;
-        BETA_SHIFT_N        : natural       := 5;
+        P_SHIFT_N           : natural       := 7;
+        I_SHIFT_N           : natural       := 0;
         ACCUM_BITS_N        : positive      := 32;
-        TUNING_WORD_N       : positive      := 22;
-        INIT_OUT_VAL        : positive      := (2**22 - 1) / 2 - 1;
+        TUNING_WORD_N       : positive      := 23;
+        INIT_OUT_VAL        : positive      := 2347483;
         DT_COUNTER_N        : positive      := 16;
-        DT_VAL              : natural       := 100
+        DT_VAL              : natural       := 100;
+        OUT_OFFSET          : natural       := 2**21;
+        OUT_VAL_LIMIT       : positive      := 2347483
     );
 end entity;
 
@@ -54,13 +56,15 @@ begin
     generic map
     (
         COUNTER_N           => COUNTER_N,
-        ALPHA_SHIFT_N       => ALPHA_SHIFT_N,
-        BETA_SHIFT_N        => BETA_SHIFT_N,
+        P_SHIFT_N           => P_SHIFT_N,
+        I_SHIFT_N           => I_SHIFT_N,
         ACCUM_BITS_N        => ACCUM_BITS_N,
         TUNING_WORD_N       => TUNING_WORD_N,
         INIT_OUT_VAL        => INIT_OUT_VAL,
         DT_COUNTER_N        => DT_COUNTER_N,
-        DT_VAL              => DT_VAL
+        DT_VAL              => DT_VAL,
+        OUT_OFFSET          => OUT_OFFSET,
+        OUT_VAL_LIMIT       => OUT_VAL_LIMIT
     )
     port map
     (

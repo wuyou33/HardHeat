@@ -10,15 +10,17 @@ entity hardheat is
     generic
     (
         COUNTER_N           : positive;
-        ALPHA_SHIFT_N       : natural;
-        BETA_SHIFT_N        : natural;
+        P_SHIFT_N           : natural;
+        I_SHIFT_N           : natural;
         ACCUM_BITS_N        : positive;
         TUNING_WORD_N       : positive;
         INIT_OUT_VAL        : positive;
         -- Number of bits in the deadtime counter
         DT_COUNTER_N        : positive;
         -- Amount of deadtime
-        DT_VAL              : natural
+        DT_VAL              : natural;
+        OUT_OFFSET          : natural;
+        OUT_VAL_LIMIT       : positive
     );
     port
     (
@@ -50,11 +52,13 @@ begin
     generic map
     (
         COUNTER_N           => COUNTER_N,
-        ALPHA_SHIFT_N       => ALPHA_SHIFT_N,
-        BETA_SHIFT_N        => BETA_SHIFT_N,
+        P_SHIFT_N           => P_SHIFT_N,
+        I_SHIFT_N           => I_SHIFT_N,
         ACCUM_BITS_N        => ACCUM_BITS_N,
         TUNING_WORD_N       => TUNING_WORD_N,
-        INIT_OUT_VAL        => INIT_OUT_VAL
+        INIT_OUT_VAL        => INIT_OUT_VAL,
+        OUT_OFFSET          => OUT_OFFSET,
+        OUT_VAL_LIMIT       => OUT_VAL_LIMIT
     )
     port map
     (

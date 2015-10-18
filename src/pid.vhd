@@ -1,6 +1,8 @@
 library ieee;
+library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.utils_pkg.all;
 
 entity pid is
     generic
@@ -25,9 +27,7 @@ entity pid is
         clk                 : in std_logic;
         reset               : in std_logic;
         pid_in              : in signed(IN_N downto 0);
-        pid_out             : out unsigned(OUT_N - 1 downto 0);
-        proportional_out    : out signed(OUT_N downto 0);
-        integral_out        : out signed(OUT_N downto 0)
+        pid_out             : out unsigned(OUT_N - 1 downto 0)
     );
 end entity;
 
@@ -35,25 +35,24 @@ architecture pid_arch of pid is
 begin
 
     pid_p: process(clk, reset)
-        variable proportional   : signed(OUT_N downto 0);
+        -- Size variable so that the bigges possible value fits
+        variable prop           : signed(ceil_log2(2**IN_N * 2**P_SHIFT_N)
+			downto 0);
         variable integral       : signed(OUT_N downto 0);
-        variable temp           : signed(OUT_N downto 0);
+        variable sum            : signed(OUT_N downto 0);
         variable temp_out       : unsigned(OUT_N - 1 downto 0);
     begin
         if reset = '1' then
             pid_out <= to_unsigned(INIT_OUT_VAL, pid_out'length);
-            proportional := (others => '0');
-            proportional_out <= proportional;
+            prop := (others => '0');
             integral := (others => '0');
-            integral_out <= integral;
         elsif rising_edge(clk) then
-            -- TODO: What about saturation?
-            proportional := shift_left(resize(-pid_in, OUT_N + 1), P_SHIFT_N);
-            proportional_out <= proportional;
+            prop := shift_left(resize(-pid_in, prop'length), P_SHIFT_N);
             integral := integral - pid_in;
-            integral_out <= integral;
-            temp := signed(std_logic_vector(resize(proportional, proportional'length))) + signed(std_logic_vector(shift_left(integral, I_SHIFT_N)));
-            temp_out := unsigned(std_logic_vector(temp(temp'high - 1 downto 0))) + to_unsigned(OUT_OFFSET, pid_out'length);
+            sum := prop + shift_right(integral, I_SHIFT_N);
+            -- Strip sign bit, add offset and limit value
+            temp_out := unsigned(std_logic_vector(sum(sum'high - 1 downto 0)))
+                + to_unsigned(OUT_OFFSET, pid_out'length);
             if temp_out > OUT_VAL_LIMIT then
                 pid_out <= to_unsigned(OUT_VAL_LIMIT, OUT_N);
             else

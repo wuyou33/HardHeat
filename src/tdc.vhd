@@ -69,4 +69,4 @@ begin
         end if;
     end process;
 
-end tdc_arch;
+end;

@@ -19,9 +19,7 @@ package pid_pkg is
             clk                 : in std_logic;
             reset               : in std_logic;
             pid_in              : in signed(IN_N downto 0);
-            pid_out             : out unsigned(OUT_N - 1 downto 0);
-            proportional_out    : out signed(OUT_N downto 0);
-            integral_out        : out signed(OUT_N downto 0)
+            pid_out             : out unsigned(OUT_N - 1 downto 0)
         );
     end component;
 end package;
