@@ -20,7 +20,13 @@ entity hardheat is
         -- Amount of deadtime
         DT_VAL              : natural;
         OUT_OFFSET          : natural;
-        OUT_VAL_LIMIT       : positive
+        OUT_VAL_LIMIT       : positive;
+        -- Number of bits in the lock counter
+        LOCK_COUNT_N        : positive;
+        -- Number of bits in the unlock counter
+        ULOCK_COUNT_N       : positive;
+        -- Value under which the phase is considered to be locked
+        LOCK_LIMIT          : natural
     );
     port
     (
@@ -34,7 +40,8 @@ entity hardheat is
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
-        sig_rl_out          : out std_logic
+        sig_rl_out          : out std_logic;
+        lock_out            : out std_logic
     );
 end entity;
 
@@ -58,14 +65,18 @@ begin
         TUNING_WORD_N       => TUNING_WORD_N,
         INIT_OUT_VAL        => INIT_OUT_VAL,
         OUT_OFFSET          => OUT_OFFSET,
-        OUT_VAL_LIMIT       => OUT_VAL_LIMIT
+        OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
+        LOCK_COUNT_N        => LOCK_COUNT_N,
+        ULOCK_COUNT_N       => ULOCK_COUNT_N,
+        LOCK_LIMIT          => LOCK_LIMIT
     )
     port map
     (
         clk                 => clk,
         reset               => reset,
         ref_in              => ref_in,
-        sig_out             => sig
+        sig_out             => sig,
+        lock_out            => lock_out
     );
 
     epdm_p: epdm

@@ -9,6 +9,7 @@ HardHeat currently consists of:
   - Time-to-digital converter converting the PFD output to a time value for the loop filter
   - PI-controller working as the loop filter, simple model with bitshifted coefficients
   - Phase accumulator working as the digitally controlled oscillator
+  - PLL lock detector
   - Deadtime generator (static deadtime value)
   - Enchanced pulse density modulator based on [*2*] for adjusting power level
     - For power factor correction, not implemented yet
@@ -17,7 +18,7 @@ This GitHub repository contains all the required components and the associated t
 
 The controller has not been tested yet with actual hardware (work in progress).
 
-Thanks to Anders M. for pointing out [1] and to jahonen for help with VHDL!
+Thanks to Anders M. for pointing out [*1*] and to jahonen for help with VHDL!
 
 Kalle Hyvönen - [DGKelectronics.com](http://www.dgkelectronics.com)
 

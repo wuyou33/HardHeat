@@ -6,6 +6,7 @@ use work.resonant_pfd_pkg.all;
 use work.tdc_pkg.all;
 use work.pid_pkg.all;
 use work.phase_accumulator_pkg.all;
+use work.lock_detector_pkg.all;
 
 entity adpll is
     generic
@@ -17,14 +18,18 @@ entity adpll is
         TUNING_WORD_N   : positive;
         INIT_OUT_VAL    : positive;
         OUT_OFFSET      : natural;
-        OUT_VAL_LIMIT   : positive
+        OUT_VAL_LIMIT   : positive;
+        LOCK_COUNT_N    : positive;
+        ULOCK_COUNT_N   : positive;
+        LOCK_LIMIT      : natural
     );
     port
     (
         clk             : in std_logic;
         reset           : in std_logic;
         ref_in          : in std_logic;
-        sig_out         : out std_logic
+        sig_out         : out std_logic;
+        lock_out        : out std_logic
     );
 end entity;
 
@@ -94,6 +99,22 @@ begin
         reset           => reset,
         tuning_word_in  => tuning_word,
         sig_out         => sig
+    );
+
+    lock_detector_p: lock_detector
+    generic map
+    (
+        PHASE_TIME_IN_N => COUNTER_N,
+        LOCK_COUNT_N    => LOCK_COUNT_N,
+        ULOCK_COUNT_N   => ULOCK_COUNT_N,
+        LOCK_LIMIT      => LOCK_LIMIT
+    )
+    port map
+    (
+        clk             => clk,
+        reset           => reset,
+        phase_time_in   => phase_time,
+        lock_out        => lock_out
     );
 
 end;

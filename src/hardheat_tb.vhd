@@ -16,7 +16,10 @@ entity hardheat_tb is
         DT_COUNTER_N        : positive      := 16;
         DT_VAL              : natural       := 100;
         OUT_OFFSET          : natural       := 2**21;
-        OUT_VAL_LIMIT       : positive      := 2347483
+        OUT_VAL_LIMIT       : positive      := 2347483;
+        LOCK_COUNT_N        : positive      := 20;
+        ULOCK_COUNT_N       : positive      := 16;
+        LOCK_LIMIT          : natural       := 100
     );
 end entity;
 
@@ -64,7 +67,10 @@ begin
         DT_COUNTER_N        => DT_COUNTER_N,
         DT_VAL              => DT_VAL,
         OUT_OFFSET          => OUT_OFFSET,
-        OUT_VAL_LIMIT       => OUT_VAL_LIMIT
+        OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
+        LOCK_COUNT_N        => LOCK_COUNT_N,
+        ULOCK_COUNT_N       => ULOCK_COUNT_N,
+        LOCK_LIMIT          => LOCK_LIMIT
     )
     port map
     (
