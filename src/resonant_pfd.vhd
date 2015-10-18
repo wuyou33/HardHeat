@@ -21,17 +21,17 @@ begin
 
     -- D-type flip-flop
     ff_p: process(clk, reset)
-        variable last_ref   : std_logic;
+        variable last_sig   : std_logic;
     begin
         if reset = '1' then
             ff <= '0';
-            last_ref := '0';
+            last_sig := sig_in;
         -- FF is synchronous so we do not have to synchronize the output after
         elsif rising_edge(clk) then
-            if not ref_in = last_ref and ref_in = '1' then
-                ff <= sig_in;
+            if not sig_in = last_sig and sig_in = '1' then
+                ff <= ref_in;
             end if;
-            last_ref := ref_in;
+            last_sig := sig_in;
         end if;
     end process;
 

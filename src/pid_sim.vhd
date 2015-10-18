@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity pid is
+entity pid_sim is
     generic
     (
         -- Proportional coefficient, input value multiplied by 2^P_SHIFT_N
@@ -31,33 +31,30 @@ entity pid is
     );
 end entity;
 
-architecture pid_arch of pid is
+architecture pid_sim_arch of pid_sim is
 begin
 
     pid_p: process(clk, reset)
-        variable proportional   : signed(OUT_N downto 0);
-        variable integral       : signed(OUT_N downto 0);
-        variable temp           : signed(OUT_N downto 0);
-        variable temp_out       : unsigned(OUT_N - 1 downto 0);
+        variable proportional   : integer;
+        variable integral       : integer;
+        variable temp           : integer;
     begin
         if reset = '1' then
             pid_out <= to_unsigned(INIT_OUT_VAL, pid_out'length);
-            proportional := (others => '0');
-            proportional_out <= proportional;
-            integral := (others => '0');
-            integral_out <= integral;
+            proportional := 0;
+            proportional_out <= to_signed(proportional, proportional_out'length);
+            integral := 0;
+            integral_out <= to_signed(integral, integral_out'length);
         elsif rising_edge(clk) then
-            -- TODO: What about saturation?
-            proportional := shift_left(resize(-pid_in, OUT_N + 1), P_SHIFT_N);
-            proportional_out <= proportional;
-            integral := integral - pid_in;
-            integral_out <= integral;
-            temp := signed(std_logic_vector(resize(proportional, proportional'length))) + signed(std_logic_vector(shift_left(integral, I_SHIFT_N)));
-            temp_out := unsigned(std_logic_vector(temp(temp'high - 1 downto 0))) + to_unsigned(OUT_OFFSET, pid_out'length);
-            if temp_out > OUT_VAL_LIMIT then
+            proportional := to_integer(-pid_in) * 2**P_SHIFT_N;
+            integral := integral + to_integer(-pid_in);
+            proportional_out <= to_signed(proportional, proportional_out'length);
+            integral_out <= to_signed(integral, integral_out'length);
+            temp := proportional + (integral * 2**I_SHIFT_N) + OUT_OFFSET;
+            if temp > OUT_VAL_LIMIT then
                 pid_out <= to_unsigned(OUT_VAL_LIMIT, OUT_N);
             else
-                pid_out <= temp_out;
+                pid_out <= to_unsigned(temp, OUT_N);
             end if;
         end if;
     end process;
