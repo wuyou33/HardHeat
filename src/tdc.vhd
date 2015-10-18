@@ -21,45 +21,51 @@ entity tdc is
 end tdc;
 
 architecture tdc_arch of tdc is
-    signal sign         : std_logic;
 begin
-
-    -- D-type flip-flop generating the sign-bit for the output
-    sign_ff_p: process(down_in, reset)
-    begin
-        if reset = '1' then
-            sign <= '0';
-            sign_out <= sign;
-        elsif rising_edge(down_in) then
-            sign <= up_in;
-            sign_out <= sign;
-        end if;
-    end process;
 
     tdc_p: process(clk, reset)
         variable sig_or     : std_logic;
-        variable last_state : std_logic;
+        variable last_or    : std_logic;
+        variable last_up    : std_logic;
+        variable last_down  : std_logic;
+        variable sign       : std_logic;
         variable count      : signed(COUNTER_N downto 0);
     begin
         if reset = '1' then
             time_out <= (others => '0');
             count := (others => '0');
-            last_state := '0';
+            last_or := '0';
+            last_up := up_in;
+            last_down := down_in;
+            sign := '0';
+            sign_out <= sign;
         elsif rising_edge(clk) then
+            if not up_in = last_up and up_in = '1' then
+                sign := '1';
+                sign_out <= sign;
+            elsif not down_in = last_down and down_in = '1' then
+                sign := '0';
+                sign_out <= sign;
+            end if;
+            last_up := up_in;
+            last_down := down_in;
             sig_or := up_in or down_in;
             sig_or_out <= sig_or;
-            -- Count when the or signal is high, sign comes from flip-flop
+            -- Count when the or signal is high
             if sig_or = '1' then
                 count := count + 1;
             else
-                if last_state = '1' then
-                    time_out <= count;
-                    -- Add the sign
-                    time_out(time_out'high) <= sign;
+                if last_or = '1' then
+                    -- Apply sign
+                    if sign = '1' then
+                        time_out <= not count + 1;
+                    else
+                        time_out <= count;
+                    end if;
                     count := (others => '0');
                 end if;
             end if;
-            last_state := sig_or;
+            last_or := sig_or;
         end if;
     end process;
 

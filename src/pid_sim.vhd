@@ -47,7 +47,7 @@ begin
             integral_out <= to_signed(integral, integral_out'length);
         elsif rising_edge(clk) then
             proportional := to_integer(-pid_in) * 2**P_SHIFT_N;
-            integral := integral + to_integer(-pid_in);
+            integral := integral - to_integer(pid_in);
             proportional_out <= to_signed(proportional, proportional_out'length);
             integral_out <= to_signed(integral, integral_out'length);
             temp := proportional + (integral * 2**I_SHIFT_N) + OUT_OFFSET;

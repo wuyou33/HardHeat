@@ -24,7 +24,7 @@ begin
     generic map
     (
         COUNTER_N               => 12,
-        P_SHIFT_N               => 8,
+        P_SHIFT_N               => 7,
         I_SHIFT_N               => 0,
         ACCUM_BITS_N            => 32,
         TUNING_WORD_N           => 23,
