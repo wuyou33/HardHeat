@@ -1,6 +1,14 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 package utils_pkg is
 	function log2(Arg : natural) return natural;
 	function ceil_log2(Arg : positive) return natural;
+    function shift_right_vec(Arg : std_logic_vector; Num : positive)
+        return std_logic_vector;
+    function shift_left_vec(Arg : std_logic_vector; Num : positive)
+        return std_logic_vector;
 end package;
 
 package body utils_pkg is
@@ -30,5 +38,21 @@ package body utils_pkg is
 		else
 			return(RetVal);
 		end if;
-	end function ceil_log2;
+	end function;
+	---------------------------------------------------------------------------
+	-- Shift an std_logic_vector right
+	---------------------------------------------------------------------------
+    function shift_right_vec(Arg : std_logic_vector; Num : positive)
+        return std_logic_vector is
+    begin
+        return(std_logic_vector(shift_right(unsigned(Arg), Num)));
+    end function;
+	---------------------------------------------------------------------------
+	-- Shift an std_logic_vector left
+	---------------------------------------------------------------------------
+    function shift_left_vec(Arg : std_logic_vector; Num : positive)
+        return std_logic_vector is
+    begin
+        return(std_logic_vector(shift_left(unsigned(Arg), Num)));
+    end function;
 end package body;
