@@ -69,12 +69,12 @@ begin
 
     reset <= '1', '0' after 500 ns;
 
-    -- Generate a reset pulse on the 1-wire bus once reset is done
     clk_gen: process(clk)
     begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
+    -- Generate a reset pulse on the 1-wire bus once reset is done
     ow_reset_gen: process(clk, reset)
         variable done       : std_logic;
     begin
