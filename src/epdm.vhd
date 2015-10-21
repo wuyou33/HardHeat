@@ -34,7 +34,7 @@ begin
             sig_rh_out <= '0';
             sig_rl_out <= '0';
             count := (others => '0');
-            last_state := sig_in;
+            last_state := '0';
             skip := '1';
         elsif rising_edge(clk) then
             -- New modulation level, reset counter

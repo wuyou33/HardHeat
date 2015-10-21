@@ -35,8 +35,8 @@ begin
             time_out <= (others => '0');
             count := (others => '0');
             last_or := '0';
-            last_up := up_in;
-            last_down := down_in;
+            last_up := '0';
+            last_down := '0';
             sign := '0';
             sign_out <= sign;
         elsif rising_edge(clk) then

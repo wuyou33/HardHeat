@@ -25,7 +25,7 @@ begin
     begin
         if reset = '1' then
             ff <= '0';
-            last_sig := sig_in;
+            last_sig := '0';
         -- FF is synchronous so we do not have to synchronize the output after
         elsif rising_edge(clk) then
             if not sig_in = last_sig and sig_in = '1' then

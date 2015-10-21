@@ -21,14 +21,12 @@ end entity;
 
 architecture phase_accumulator_arch of phase_accumulator is
     signal accumulator  : unsigned (ACCUM_BITS_N - 1 downto 0);
-    signal out_state    : std_logic;
 begin
 
     accumulate: process(clk, reset)
     begin
         if reset = '1' then
             accumulator <= to_unsigned(0, ACCUM_BITS_N);
-            out_state <= '0';
             sig_out <= '0';
         elsif rising_edge(clk) then
             accumulator <= accumulator + tuning_word_in;

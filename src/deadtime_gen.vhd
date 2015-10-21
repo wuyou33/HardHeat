@@ -32,7 +32,7 @@ begin
             sig_out <= '0';
             sig_n_out <= '0';
             off := '0';
-            last_state := sig_in;
+            last_state := '0';
             count := (others => '0');
         elsif rising_edge(clk) then
             if sig_in = last_state then
