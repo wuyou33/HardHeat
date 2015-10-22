@@ -81,8 +81,9 @@ begin
     )
     port map
     (
-        clk             => ref_in,
+        clk             => clk,
         reset           => reset,
+        upd_clk_in      => ref_in,
         pid_in          => phase_time,
         pid_out         => tuning_word
     );

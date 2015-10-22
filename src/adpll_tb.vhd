@@ -30,7 +30,10 @@ begin
         TUNING_WORD_N           => 23,
         INIT_OUT_VAL            => (2**22 - 1) / 4,
         OUT_OFFSET              => 2**21,
-        OUT_VAL_LIMIT           => 2547483
+        OUT_VAL_LIMIT           => 2547483,
+        LOCK_COUNT_N            => 20,
+        ULOCK_COUNT_N           => 16,
+        LOCK_LIMIT              => 100
     )
     port map
     (

@@ -18,6 +18,7 @@ package pid_pkg is
         (
             clk                 : in std_logic;
             reset               : in std_logic;
+            upd_clk_in          : in std_logic;
             pid_in              : in signed(IN_N downto 0);
             pid_out             : out unsigned(OUT_N - 1 downto 0)
         );

@@ -9,10 +9,13 @@ end entity;
 
 architecture pid_tb_arch of pid_tb is
 
+    -- Clock frequency 100 MHz
+    constant CLK_PERIOD         : time := 1 sec / 10e7;
     -- Run the filter at 50 kHz
-    constant CLK_PERIOD         : time := 1 sec / 50e3;
+    constant UPD_PERIOD         : time := 1 sec / 50e3;
 
     signal clk                  : std_logic := '0';
+    signal upd                  : std_logic := '0';
     signal reset                : std_logic;
     signal filt_in              : std_logic;
 
@@ -33,6 +36,7 @@ begin
     (
         clk                 => clk,
         reset               => reset,
+        upd_clk_in          => upd,
         pid_in              => to_signed(2**10, 12)
     );
 
@@ -41,6 +45,11 @@ begin
     clk_gen: process(clk)
     begin
         clk <= not clk after CLK_PERIOD / 2;
+    end process;
+
+    upd_gen: process(upd)
+    begin
+        upd <= not upd after UPD_PERIOD / 2;
     end process;
 
 end;

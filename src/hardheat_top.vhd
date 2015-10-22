@@ -30,7 +30,8 @@ entity hardheat_top is
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
-        sig_rl_out          : out std_logic
+        sig_rl_out          : out std_logic;
+        lock_out            : out std_logic
     );
 end entity;
 
@@ -40,8 +41,13 @@ architecture hardheat_arch_top of hardheat_top is
     signal mod_lvl_f        : std_logic;
 begin
 
-    -- Buttons are normally high, invert reset input
-    reset_n <= not reset_in;
+    -- Invert reset_in and sync to clk
+    reset_clk_sync_p: process(clk_in)
+    begin
+        if rising_edge(clk_in) then
+            reset_n <= not reset_in;
+        end if;
+    end process;
 
     -- Fix modulation level to no modulation
     mod_lvl <= to_unsigned(4, mod_lvl'length);
@@ -76,7 +82,8 @@ begin
         sig_lh_out          => sig_lh_out,
         sig_ll_out          => sig_ll_out,
         sig_rh_out          => sig_rh_out,
-        sig_rl_out          => sig_rl_out
+        sig_rl_out          => sig_rl_out,
+        lock_out            => lock_out
     );
 
 end;
