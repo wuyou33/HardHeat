@@ -36,6 +36,7 @@ architecture pid_arch of pid is
 begin
 
     pid_p: process(clk, reset)
+        variable step           : std_logic;
         -- Size variable so that the bigges possible value fits
         variable prop           : signed(ceil_log2(2**IN_N * 2**P_SHIFT_N)
 			downto 0);
@@ -45,6 +46,7 @@ begin
         variable last_state     : std_logic;
     begin
         if reset = '1' then
+            step := '0';
             pid_out <= to_unsigned(INIT_OUT_VAL, pid_out'length);
             prop := (others => '0');
             integral := (others => '0');
@@ -54,6 +56,8 @@ begin
                 prop := shift_left(resize(-pid_in, prop'length), P_SHIFT_N);
                 integral := integral - pid_in;
                 sum := prop + shift_right(integral, I_SHIFT_N);
+                step := '1';
+            elsif step = '1' then
                 -- Strip sign bit, add offset and limit value
                 temp_out := unsigned(std_logic_vector(
                     sum(sum'high - 1 downto 0)))
@@ -63,6 +67,7 @@ begin
                 else
                     pid_out <= temp_out;
                 end if;
+                step := '0';
             end if;
             last_state := upd_clk_in;
         end if;
