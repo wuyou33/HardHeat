@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 package utils_pkg is
 	function log2(Arg : natural) return natural;
-	function ceil_log2(Arg : positive) return natural;
+	function ceil_log2(Arg : natural) return natural;
     function shift_right_vec(Arg : std_logic_vector; Num : positive)
         return std_logic_vector;
     function shift_left_vec(Arg : std_logic_vector; Num : positive)
@@ -15,7 +15,7 @@ package body utils_pkg is
 	---------------------------------------------------------------------------
 	-- Function for calculating the base-2 logarithm
 	---------------------------------------------------------------------------
-	function log2(Arg : natural) return integer is
+	function log2(Arg : natural) return natural is
 		variable temp    	: integer := Arg;
 		variable ret_val 	: integer := 0;
 	begin
@@ -28,7 +28,7 @@ package body utils_pkg is
 	---------------------------------------------------------------------------
 	-- Function for calculating the minimum number of bits to represent Arg
 	---------------------------------------------------------------------------
-	function ceil_log2(Arg : positive) return natural is
+	function ceil_log2(Arg : natural) return natural is
 		variable RetVal		: natural;
 	begin
 		RetVal := log2(Arg);

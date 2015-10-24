@@ -13,7 +13,6 @@ architecture one_wire_tb_arch of one_wire_tb is
     constant CLK_PERIOD     : time := 1 sec / 10e7;
 
     constant TX_TEST_DATA   : std_logic_vector(7 downto 0)  := "10101010";
-    --constant TX_TEST_DATA   : std_logic_vector(7 downto 0)  := "10011001";
     constant RX_TEST_DATA   : std_logic_vector(7 downto 0)  := "10101010";
 
     signal clk              : std_logic := '0';
@@ -74,6 +73,7 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
+    -- TODO: Change all these processes to a single state machine!
     -- Generate a reset pulse on the 1-wire bus once reset is done
     ow_reset_gen: process(clk, reset)
         variable done       : std_logic;
@@ -163,14 +163,14 @@ begin
             done := '0';
             sending := '0';
             ow_in <= '0';
-            index := 8;
+            index := 0;
         elsif rising_edge(send_done) then
             -- Only start sending after TX test is done
             sending := '1';
         elsif rising_edge(ow_out) then
             if sending = '1' then
-                index := index - 1;
-                if index = 0 then
+                index := index + 1;
+                if index = 7 then
                     ow_in <= RX_TEST_DATA(index);
                     sending := '0';
                     done := '1';

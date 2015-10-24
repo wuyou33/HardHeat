@@ -25,6 +25,7 @@ package one_wire_pkg is
             data_in             : in std_logic_vector(8 - 1 downto 0);
             data_in_f           : in std_logic;
             receive_data_f      : in std_logic;
+            crc_out             : out std_logic_vector(8 - 1 downto 0);
             data_out            : out std_logic_vector(8 - 1 downto 0);
             data_out_f          : out std_logic;
             ow_out              : out std_logic;

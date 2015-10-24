@@ -31,6 +31,7 @@ entity one_wire is
         data_in_f           : in std_logic;
         -- Flag for starting the process of receiving data
         receive_data_f      : in std_logic;
+        crc_out             : out std_logic_vector(8 - 1 downto 0);
         -- Data received from the 1-wire bus
         data_out            : out std_logic_vector(8 - 1 downto 0);
         -- Strobe indicating new data has been received
@@ -53,7 +54,32 @@ architecture one_wire_arch of one_wire is
     signal busy_reset       : std_logic;
     signal busy_send        : std_logic;
     signal busy_receive     : std_logic;
+    signal last_bit         : std_logic;
+    signal last_bit_f       : std_logic;
+    signal crc_reset        : std_logic;
 begin
+
+    -- Invert and combine signals so application logic matches bus state
+    ow_out <= not ow_reset_out or not ow_send_out or not ow_receive_out;
+    -- Combine process-specific busy signals
+    busy_out <= busy_reset or busy_send or busy_receive;
+
+    -- Handle and indicate errors
+    ow_error_p: process(clk, reset)
+    begin
+        if reset = '1' then
+            error_out <= '0';
+            error_id_out <= (others => '0');
+        elsif rising_edge(clk) then
+            if err_no_dev = '1' then
+                error_id_out <= to_unsigned(1, error_id_out'length);
+                error_out <= '1';
+            else
+                error_out <= '0';
+                error_id_out <= (others => '0');
+            end if;
+        end if;
+    end process;
 
     ow_rst_p: process(clk, reset)
         type ow_rst_state is (idle, reset_on, reset_sample, reset_delay);
@@ -65,22 +91,24 @@ begin
             timer := (others => '0');
             err_no_dev <= '0';
             busy_reset <= '0';
-            ow_reset_out <= '0';
+            ow_reset_out <= '1';
         elsif rising_edge(clk) then
             if state = idle then
                 if reset_ow = '1' then
                     state := reset_on;
-                    ow_reset_out <= '1';
+                    ow_reset_out <= '0';
                     busy_reset <= '1';
+                    crc_reset <= '1';
                 else
                     busy_reset <= '0';
                 end if;
             elsif state = reset_on then
+                crc_reset <= '0';
                 if timer < RESET_ON_D then
                     timer := timer + 1;
                 else
                     -- Release bus
-                    ow_reset_out <= '0';
+                    ow_reset_out <= '1';
                     state := reset_sample;
                     timer := (others => '0');
                 end if;
@@ -119,7 +147,7 @@ begin
         if reset = '1' then
             state := idle;
             -- Bus is released on reset
-            ow_send_out <= '0';
+            ow_send_out <= '1';
             busy_send <= '0';
             timer := (others => '0');
             data := (others => '0');
@@ -127,7 +155,7 @@ begin
         elsif rising_edge(clk) then
             if state = idle then
                 -- Bus always released when idle
-                ow_send_out <= '0';
+                ow_send_out <= '1';
                 if data_in_f = '1' then
                     data := data_in;
                     data_left := to_unsigned(data'length, data_left'length);
@@ -135,7 +163,7 @@ begin
                     state := tx_next_bit;
                     timer := (others => '0');
                     -- Pull bus down on both cases
-                    ow_send_out <= '1';
+                    ow_send_out <= '0';
                 else
                     busy_send <= '0';
                 end if;
@@ -144,7 +172,7 @@ begin
                     timer := timer + 1;
                 else
                     -- Release bus
-                    ow_send_out <= '0';
+                    ow_send_out <= '1';
                     state := tx_one_high;
                     timer := (others => '0');
                 end if;
@@ -159,7 +187,8 @@ begin
                 if timer < TX_ZERO_LOW_D then
                     timer := timer + 1;
                 else
-                    state := tx_next_bit;
+                    ow_send_out <= '1';
+                    state := tx_zero_high;
                     timer := (others => '0');
                 end if;
             elsif state = tx_zero_high then
@@ -173,16 +202,16 @@ begin
                 if data_left = 0 then
                     state := idle;
                 else
-                    if data(data'left) = '1' then
+                    if data(data'right) = '1' then
                         state := tx_one_low;
                     else
                         state := tx_zero_low;
                     end if;
                     data_left := data_left - 1;
                     -- Shift data
-                    data := shift_left_vec(data, 1);
+                    data := shift_right_vec(data, 1);
                     -- Pull bus down on both cases
-                    ow_send_out <= '1';
+                    ow_send_out <= '0';
                 end if;
                 timer := (others => '0');
             end if;
@@ -199,20 +228,22 @@ begin
     begin
         if reset = '1' then
             state := idle;
-            ow_receive_out <= '0';
+            ow_receive_out <= '1';
             busy_receive <= '0';
             timer := (others => '0');
             data := (others => '0');
             data_left := (others => '0');
             data_out <= (others => '0');
             data_out_f <= '0';
+            last_bit <= '0';
+            last_bit_f <= '0';
         elsif rising_edge(clk) then
             if state = idle then
                 -- Reset data out indicator strobe
                 data_out_f <= '0';
                 if receive_data_f = '1' then
                     -- Pull bus low
-                    ow_receive_out <= '1';
+                    ow_receive_out <= '0';
                     busy_receive <= '1';
                     data := (others => '0');
                     data_left := to_unsigned(data'length, data_left'length);
@@ -227,7 +258,7 @@ begin
                     timer := timer + 1;
                 else
                     -- Release bus
-                    ow_receive_out <= '0';
+                    ow_receive_out <= '1';
                     state := rx_sample;
                     timer := (others => '0');
                 end if;
@@ -235,17 +266,21 @@ begin
                 if timer < RX_SAMPLE_D then
                     timer := timer + 1;
                 else
-                    data(0) := ow_in;
+                    data(data'left) := ow_in;
+                    -- Signal CRC module of the last bit
+                    last_bit <= ow_in;
+                    last_bit_f <= '1';
                     data_left := data_left - 1;
                     state := rx_release;
                     timer := (others => '0');
                 end if;
             elsif state = rx_release then
+                last_bit_f <= '0';
                 if timer < RX_RELEASE_D then
                     timer := timer + 1;
                 else
                     -- Release bus
-                    ow_receive_out <= '0';
+                    ow_receive_out <= '1';
                     state := rx_next_bit;
                     timer := (others => '0');
                 end if;
@@ -255,45 +290,33 @@ begin
                     data_out <= data;
                     data_out_f <= '1';
                 else
-                    data := shift_left_vec(data, 1);
-                    ow_receive_out <= '1';
+                    data := shift_right_vec(data, 1);
+                    ow_receive_out <= '0';
                     state := rx_low;
                 end if;
             end if;
         end if;
     end process;
 
-    ow_write_p: process(clk, reset)
+    -- CRC calculator, calculated whenever we receive a new bit
+    crc_p: process(clk, reset)
+        variable crc            : std_logic_vector(crc_out'range);
     begin
         if reset = '1' then
-            ow_out <= '0';
+            crc := (others => '0');
+            crc_out <= (others => '0');
         elsif rising_edge(clk) then
-            ow_out <= ow_reset_out or ow_send_out or ow_receive_out;
-        end if;
-    end process;
-
-    ow_error_p: process(clk, reset)
-    begin
-        if reset = '1' then
-            error_out <= '0';
-            error_id_out <= (others => '0');
-        elsif rising_edge(clk) then
-            if err_no_dev = '1' then
-                error_id_out <= to_unsigned(1, error_id_out'length);
-                error_out <= '1';
-            else
-                error_out <= '0';
-                error_id_out <= (others => '0');
+            if last_bit_f = '1' then
+                crc(crc'left) := last_bit xor crc(crc'right);
+                crc(4) := crc(3) xor crc(crc'left);
+                crc(5) := crc(4) xor crc(crc'left);
+                crc := shift_left_vec(crc, 1);
+                crc_out <= crc;
             end if;
-        end if;
-    end process;
-
-    ow_busy_p: process(clk, reset)
-    begin
-        if reset = '1' then
-            busy_out <= '0';
-        elsif rising_edge(clk) then
-            busy_out <= busy_reset or busy_send or busy_receive;
+            if crc_reset = '1' then
+                crc := (others => '0');
+                crc_out <= (others => '0');
+            end if;
         end if;
     end process;
 
