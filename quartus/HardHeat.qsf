@@ -81,18 +81,29 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ref_in
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to reset_in
 set_location_assignment PIN_AD10 -to ow_out
 set_location_assignment PIN_AE11 -to ow_in
-set_instance_assignment -name IO_STANDARD "2.5 V" -to ow_in
-set_instance_assignment -name IO_STANDARD "2.5 V" -to ow_out
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ow_in
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ow_out
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ow_in
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ow_out
 set_instance_assignment -name SLEW_RATE 0 -to ow_out
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_in
-set_instance_assignment -name IO_STANDARD "2.5 V" -to lock_out
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to lock_out
 set_instance_assignment -name IO_STANDARD "2.5 V" -to ref_in
 set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_in
 set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_lh_out
 set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_ll_out
 set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_rh_out
+set_location_assignment PIN_W25 -to mod_lvl_in[0]
+set_location_assignment PIN_V25 -to mod_lvl_in[1]
+set_location_assignment PIN_AC28 -to mod_lvl_in[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[0]
+set_global_assignment -name VHDL_FILE ../src/pwm_pkg.vhd
+set_global_assignment -name VHDL_FILE ../src/pwm.vhd
 set_global_assignment -name VHDL_FILE altera_pll_top_pkg.vhd
 set_global_assignment -name QIP_FILE altera_pll_top.qip
 set_global_assignment -name VHDL_FILE ../src/temp_controller_pkg.vhd
@@ -123,13 +134,8 @@ set_global_assignment -name VHDL_FILE ../src/deadtime_gen.vhd
 set_global_assignment -name VHDL_FILE ../src/adpll_pkg.vhd
 set_global_assignment -name VHDL_FILE ../src/adpll.vhd
 set_global_assignment -name CDF_FILE output_files/Chain.cdf
-set_location_assignment PIN_W25 -to mod_lvl_in[0]
-set_location_assignment PIN_V25 -to mod_lvl_in[1]
-set_location_assignment PIN_AC28 -to mod_lvl_in[2]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[2]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[1]
-set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[0]
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[2]
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[1]
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[0]
+set_location_assignment PIN_AD7 -to pwm_out
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pwm_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to pwm_out
+set_instance_assignment -name SLEW_RATE 0 -to pwm_out
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -29,7 +29,13 @@ package hardheat_pkg is
             TX_ZERO_LOW_D       : positive;
             TX_ZERO_HIGH_D      : positive;
             RX_SAMPLE_D         : positive;
-            RX_RELEASE_D        : positive
+            RX_RELEASE_D        : positive;
+            PWM_COUNTER_N       : positive;
+            MIN_MOD_LVL         : natural;
+            ENABLE_ON_D         : natural;
+            TEMP_P_SHIFT_N      : natural;
+            TEMP_I_SHIFT_N      : natural;
+            PID_IN_OFFSET       : integer
         );
         port
         (
@@ -49,7 +55,8 @@ package hardheat_pkg is
             lock_out            : out std_logic;
             temp_out            : out signed(16 - 1 downto 0);
             temp_out_f          : out std_logic;
-            temp_error_out      : out std_logic
+            temp_error_out      : out std_logic;
+            pwm_out             : out std_logic
         );
     end component;
 end package;

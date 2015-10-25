@@ -33,7 +33,13 @@ entity hardheat_top is
         TX_ZERO_LOW_D       : positive      := 6000;
         TX_ZERO_HIGH_D      : positive      := 1000;
         RX_SAMPLE_D         : positive      := 900;
-        RX_RELEASE_D        : positive      := 5500
+        RX_RELEASE_D        : positive      := 5500;
+        PWM_COUNTER_N       : positive      := 12;
+        MIN_MOD_LVL         : natural       := 2**12 / 5;
+        ENABLE_ON_D         : natural       := 200000000;
+        TEMP_P_SHIFT_N      : natural       := 4;
+        TEMP_I_SHIFT_N      : natural       := 11;
+        PID_IN_OFFSET       : integer       := -320
     );
     port
     (
@@ -48,7 +54,8 @@ entity hardheat_top is
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
         sig_rl_out          : out std_logic;
-        lock_out            : out std_logic
+        lock_out            : out std_logic;
+        pwm_out             : out std_logic
     );
 end entity;
 
@@ -131,7 +138,13 @@ begin
         TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
         TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
         RX_SAMPLE_D         => RX_SAMPLE_D,
-        RX_RELEASE_D        => RX_RELEASE_D
+        RX_RELEASE_D        => RX_RELEASE_D,
+        PWM_COUNTER_N       => PWM_COUNTER_N,
+        MIN_MOD_LVL         => MIN_MOD_LVL,
+        ENABLE_ON_D         => ENABLE_ON_D,
+        TEMP_P_SHIFT_N      => TEMP_P_SHIFT_N,
+        TEMP_I_SHIFT_N      => TEMP_I_SHIFT_N,
+        PID_IN_OFFSET       => PID_IN_OFFSET
     )
     port map
     (
@@ -150,7 +163,8 @@ begin
         ow_out              => ow_out,
         temp_out            => temp,
         temp_out_f          => temp_f,
-        temp_error_out      => temp_error
+        temp_error_out      => temp_error,
+        pwm_out             => pwm_out
     );
 
 end;
