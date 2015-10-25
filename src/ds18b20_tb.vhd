@@ -4,6 +4,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.ds18b20_pkg.all;
 use work.one_wire_pkg.all;
+use work.ds18b20_data_gen_pkg.all;
 
 entity ds18b20_tb is
 end entity;
@@ -41,6 +42,13 @@ architecture ds18b20_tb_arch of ds18b20_tb is
     signal conv             : std_logic;
 
 begin
+
+    reset <= '1', '0' after 500 ns;
+
+    clk_gen: process(clk)
+    begin
+        clk <= not clk after CLK_PERIOD / 2;
+    end process;
 
     -- Invert the output signal coming from the 1-wire module for display
     ow_out <= not ow_n_out;
@@ -102,86 +110,20 @@ begin
         crc_out             => crc
     );
 
-    reset <= '1', '0' after 500 ns;
-
-    clk_gen: process(clk)
-    begin
-        clk <= not clk after CLK_PERIOD / 2;
-    end process;
-
-    -- Send data to 1-wire module
-    data_gen: process(clk, reset)
-        type data_gen_state is (idle, wait_busy, wait_ow_high, wait_receive,
-            release_ow, tx, assert_temp);
-        variable state      : data_gen_state;
-        variable next_state : data_gen_state;
-        variable byte_num   : natural;
-        variable bit_num    : natural;
-        variable last_state : std_logic;
-        variable busy_state : std_logic;
-    begin
-        if reset = '1' then
-            state := idle;
-            next_state := idle;
-            ow_in <= '1';
-            byte_num := 0;
-            bit_num := 0;
-            last_state := '0';
-            busy_state := '0';
-            conv <= '0';
-        elsif rising_edge(clk) then
-            if state = idle then
-                conv <= '1';
-                state := wait_ow_high;
-                if receive_data_f = '1' then
-                    state := wait_ow_high;
-                end if;
-            elsif state = wait_busy then
-                if not busy_state = busy and busy = '0' then
-                    state := next_state;
-                end if;
-                busy_state := busy;
-            elsif state = wait_ow_high then
-                conv <= '0';
-                if not last_state = ow_out and ow_out = '1' then
-                    ow_in <= '0';
-                    state := wait_busy;
-                    next_state := release_ow;
-                end if;
-                last_state := ow_out;
-            elsif state = release_ow then
-                ow_in <= '1';
-                state := wait_receive;
-            elsif state = wait_receive then
-                if receive_data_f = '1' then
-                    state := tx;
-                    last_state := ow_out;
-                end if;
-            elsif state = tx then
-                if not last_state = ow_out and ow_out = '1' then
-                    ow_in <= TEST_DATA(TEST_DATA'high - byte_num)(bit_num);
-                    bit_num := bit_num + 1;
-                    if bit_num = 8 then
-                        byte_num := byte_num + 1;
-                        bit_num := 0;
-                        if byte_num = 9 then
-                            state := assert_temp;
-                            byte_num := 0;
-                            bit_num := 0;
-                        end if;
-                    end if;
-                end if;
-                last_state := ow_out;
-            elsif state = assert_temp then
-                if temp_f = '1' then
-                    assert crc = x"00" report "CRC does not match!"
-                        severity warning;
-                    assert temp = signed(TEST_TEMP) report
-                        "Received temp does not match!" severity warning;
-                    state := idle;
-                end if;
-            end if;
-        end if;
-    end process;
+    data_gen: ds18b20_data_gen
+    port map
+    (
+        clk                 => clk,
+        reset               => reset,
+        ow_in               => ow_in,
+        temp_in             => signed(TEST_TEMP),
+        temp_in_f           => '0',
+        ow_out              => ow_out,
+        conv_out            => conv,
+        crc_in              => crc,
+        receive_data_f_in   => receive_data_f,
+        busy_in             => busy,
+        test_temp_in        => signed(TEST_TEMP)
+    );
 
 end;
