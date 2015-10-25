@@ -29,6 +29,7 @@ begin
         IN_N                => 11,
         OUT_N               => 22,
         INIT_OUT_VAL        => 2**22 / 2 - 1,
+        IN_OFFSET           => 0,
         OUT_OFFSET          => 0,
         OUT_VAL_LIMIT       => 2**22 - 1
     )

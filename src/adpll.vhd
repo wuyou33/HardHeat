@@ -77,7 +77,8 @@ begin
         OUT_N           => TUNING_WORD_N,
         INIT_OUT_VAL    => INIT_OUT_VAL,
         OUT_OFFSET      => OUT_OFFSET,
-        OUT_VAL_LIMIT   => OUT_VAL_LIMIT
+        OUT_VAL_LIMIT   => OUT_VAL_LIMIT,
+        IN_OFFSET       => 0
     )
     port map
     (

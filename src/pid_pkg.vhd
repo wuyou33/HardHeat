@@ -11,6 +11,7 @@ package pid_pkg is
             IN_N                : positive;
             OUT_N               : positive;
             INIT_OUT_VAL        : positive;
+            IN_OFFSET           : integer;
             OUT_OFFSET          : natural;
             OUT_VAL_LIMIT       : positive
         );

@@ -17,6 +17,8 @@ entity pid is
         OUT_N               : positive;
         -- Initial value for the tuning word after reset
         INIT_OUT_VAL        : positive;
+        -- Offset for the in value
+        IN_OFFSET           : integer;
         -- Offset for the output value
         OUT_OFFSET          : natural;
         -- Output value limit
@@ -40,6 +42,7 @@ begin
         -- Size variable so that the bigges possible value fits
         variable prop           : signed(ceil_log2(2**IN_N * 2**P_SHIFT_N)
 			downto 0);
+        variable shift_in       : signed(IN_N downto 0);
         variable integral       : signed(OUT_N downto 0);
         variable sum            : signed(OUT_N downto 0);
         variable temp_out       : unsigned(OUT_N - 1 downto 0);
@@ -53,8 +56,9 @@ begin
             last_state := '0';
         elsif rising_edge(clk) then
             if not upd_clk_in = last_state and upd_clk_in = '1' then
-                prop := shift_left(resize(-pid_in, prop'length), P_SHIFT_N);
-                integral := integral - pid_in;
+                shift_in := pid_in + to_signed(IN_OFFSET, shift_in'length);
+                prop := shift_left(resize(-shift_in, prop'length), P_SHIFT_N);
+                integral := integral - shift_in;
                 sum := prop + shift_right(integral, I_SHIFT_N);
                 step := '1';
             elsif step = '1' then
