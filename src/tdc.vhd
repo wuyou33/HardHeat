@@ -41,10 +41,10 @@ begin
             sign_out <= sign;
         elsif rising_edge(clk) then
             if not up_in = last_up and up_in = '1' then
-                sign := '1';
+                sign := '0';
                 sign_out <= sign;
             elsif not down_in = last_down and down_in = '1' then
-                sign := '0';
+                sign := '1';
                 sign_out <= sign;
             end if;
             last_up := up_in;

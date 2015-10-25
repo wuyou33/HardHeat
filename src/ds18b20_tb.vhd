@@ -2,6 +2,7 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.utils_pkg.all;
 use work.ds18b20_pkg.all;
 use work.one_wire_pkg.all;
 use work.ds18b20_data_gen_pkg.all;
@@ -13,6 +14,9 @@ architecture ds18b20_tb_arch of ds18b20_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
+
+    -- Conversion interval in clock cycles
+    constant CONV_INTERVAL  : natural := 750000;
 
     constant TEST_TEMP      : std_logic_vector(15 downto 0) := x"0031";
     type data_t is array(natural range <>) of std_logic_vector(8 - 1 downto 0);
@@ -52,6 +56,25 @@ begin
 
     -- Invert the output signal coming from the 1-wire module for display
     ow_out <= not ow_n_out;
+
+
+    -- Perform temperature reading at predefined intervals
+    conv_p: process(clk, reset)
+        variable timer      : unsigned(ceil_log2(CONV_INTERVAL) downto 0);
+    begin
+        if reset = '1' then
+            timer := to_unsigned(CONV_INTERVAL, timer'length);
+            conv <= '0';
+        elsif rising_edge(clk) then
+            conv <= '0';
+            if timer < CONV_INTERVAL then
+                timer := timer + 1;
+            else
+                conv <= '1';
+                timer := (others => '0');
+            end if;
+        end if;
+    end process;
 
     DUT_inst: ds18b20
     generic map
@@ -116,10 +139,10 @@ begin
         clk                 => clk,
         reset               => reset,
         ow_in               => ow_in,
-        temp_in             => signed(TEST_TEMP),
-        temp_in_f           => '0',
+        temp_in             => temp,
+        temp_in_f           => temp_f,
         ow_out              => ow_out,
-        conv_out            => conv,
+        conv_in             => conv,
         crc_in              => crc,
         receive_data_f_in   => receive_data_f,
         busy_in             => busy,

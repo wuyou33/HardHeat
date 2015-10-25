@@ -16,7 +16,7 @@ entity pid is
         -- Number of output bits (unsigned)
         OUT_N               : positive;
         -- Initial value for the tuning word after reset
-        INIT_OUT_VAL        : positive;
+        INIT_OUT_VAL        : natural;
         -- Offset for the in value
         IN_OFFSET           : integer;
         -- Offset for the output value
@@ -39,7 +39,7 @@ begin
 
     pid_p: process(clk, reset)
         variable step           : std_logic;
-        -- Size variable so that the bigges possible value fits
+        -- Size variable so that the biggest possible value fits
         variable prop           : signed(ceil_log2(2**IN_N * 2**P_SHIFT_N)
 			downto 0);
         variable shift_in       : signed(IN_N downto 0);
@@ -56,10 +56,11 @@ begin
             last_state := '0';
         elsif rising_edge(clk) then
             if not upd_clk_in = last_state and upd_clk_in = '1' then
-                shift_in := pid_in + to_signed(IN_OFFSET, shift_in'length);
-                prop := shift_left(resize(-shift_in, prop'length), P_SHIFT_N);
-                integral := integral - shift_in;
-                sum := prop + shift_right(integral, I_SHIFT_N);
+                shift_in := pid_in + to_signed(IN_OFFSET, pid_in'length);
+                prop := shift_left(resize(shift_in, prop'length), P_SHIFT_N);
+                integral := integral + resize(shift_in, integral'length);
+                sum := resize(prop, sum'length)
+                    + shift_right(integral, I_SHIFT_N);
                 step := '1';
             elsif step = '1' then
                 -- Strip sign bit, add offset and limit value

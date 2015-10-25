@@ -39,7 +39,7 @@ begin
             state := idle;
             timer := (others => '0');
             cycles := (others => '0');
-            mod_lvl := (others => '0');
+            mod_lvl := to_unsigned(MIN_MOD_LVL, mod_lvl'length);
             pwm_out <= '0';
         elsif rising_edge(clk) then
             if state = idle then

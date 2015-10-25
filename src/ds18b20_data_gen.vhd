@@ -15,11 +15,12 @@ entity ds18b20_data_gen is
         -- Test temperature value in, data_gen generates a new data packet from
         -- this value and transmits it to the 1-wire bus
         test_temp_in        : in signed(16 - 1 downto 0);
+        test_temp_in_f      : in std_logic;
         crc_in              : in std_logic_vector(8 - 1 downto 0);
         receive_data_f_in   : in std_logic;
         busy_in             : in std_logic;
-        ow_in               : out std_logic;
-        conv_out            : out std_logic
+        conv_in             : in std_logic;
+        ow_in               : out std_logic
     );
 end entity;
 
@@ -94,18 +95,18 @@ begin
             bit_num := 0;
             last_state := '0';
             busy_state := '0';
-            conv_out <= '0';
             last_temp := test_temp_in;
             test_data := gen_data(test_temp_in);
         elsif rising_edge(clk) then
-            if not test_temp_in = last_temp then
+            if test_temp_in_f = '1' then
                 -- If temperature has changed, regenerate test data
                 test_data := gen_data(test_temp_in);
                 last_temp := test_temp_in;
             end if;
             if state = idle then
-                conv_out <= '1';
-                state := wait_ow_high;
+                if conv_in = '1' then
+                    state := wait_ow_high;
+                end if;
                 if receive_data_f_in = '1' then
                     state := wait_ow_high;
                 end if;
@@ -115,7 +116,6 @@ begin
                 end if;
                 busy_state := busy_in;
             elsif state = wait_ow_high then
-                conv_out <= '0';
                 if not last_state = ow_out and ow_out = '1' then
                     ow_in <= '0';
                     state := wait_busy;
@@ -132,7 +132,7 @@ begin
                 end if;
             elsif state = tx then
                 if not last_state = ow_out and ow_out = '1' then
-                    ow_in <= test_data(test_data'high - byte_num)(bit_num);
+                    ow_in <= test_data(byte_num)(bit_num);
                     bit_num := bit_num + 1;
                     if bit_num = 8 then
                         byte_num := byte_num + 1;

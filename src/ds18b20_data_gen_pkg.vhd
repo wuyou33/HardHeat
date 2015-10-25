@@ -12,11 +12,12 @@ package ds18b20_data_gen_pkg is
             temp_in             : in signed(16 - 1 downto 0);
             temp_in_f           : in std_logic;
             test_temp_in        : in signed(16 - 1 downto 0);
+            test_temp_in_f      : in std_logic;
             crc_in              : in std_logic_vector(8 - 1 downto 0);
             receive_data_f_in   : in std_logic;
             busy_in             : in std_logic;
-            ow_in               : out std_logic;
-            conv_out            : out std_logic
+            conv_in             : in std_logic;
+            ow_in               : out std_logic
         );
     end component;
 end package;
