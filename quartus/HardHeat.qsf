@@ -38,7 +38,7 @@
 
 
 set_global_assignment -name FAMILY "Cyclone V"
-set_global_assignment -name DEVICE 5CSXFC6D6F31C8
+set_global_assignment -name DEVICE 5CSXFC6D6F31C6
 set_global_assignment -name TOP_LEVEL_ENTITY hardheat_top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 15.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:32:28  OCTOBER 21, 2015"
@@ -46,16 +46,15 @@ set_global_assignment -name LAST_QUARTUS_VERSION 15.0.0
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
-set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 8_H6
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE ANY
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_location_assignment PIN_P9 -to clk_in
-set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to clk_in
-set_location_assignment PIN_P8 -to "clk_in(n)"
+set_location_assignment PIN_AF14 -to clk_in
+set_instance_assignment -name IO_STANDARD "1.8 V" -to clk_in
 set_location_assignment PIN_AE9 -to reset_in
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to reset_in
 set_location_assignment PIN_D1 -to sig_lh_out
@@ -64,6 +63,44 @@ set_location_assignment PIN_E1 -to sig_rh_out
 set_location_assignment PIN_F11 -to sig_rl_out
 set_location_assignment PIN_E9 -to ref_in
 set_location_assignment PIN_B1 -to sig_in
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name SLEW_RATE 0 -to sig_lh_out
+set_instance_assignment -name SLEW_RATE 0 -to sig_ll_out
+set_instance_assignment -name SLEW_RATE 0 -to sig_rh_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_lh_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_ll_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_rh_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_rl_out
+set_instance_assignment -name SLEW_RATE 0 -to sig_rl_out
+set_location_assignment PIN_AF10 -to lock_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to lock_out
+set_instance_assignment -name SLEW_RATE 0 -to lock_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ref_in
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to reset_in
+set_location_assignment PIN_AD10 -to ow_out
+set_location_assignment PIN_AE11 -to ow_in
+set_instance_assignment -name IO_STANDARD "2.5 V" -to ow_in
+set_instance_assignment -name IO_STANDARD "2.5 V" -to ow_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ow_in
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ow_out
+set_instance_assignment -name SLEW_RATE 0 -to ow_out
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_in
+set_instance_assignment -name IO_STANDARD "2.5 V" -to lock_out
+set_instance_assignment -name IO_STANDARD "2.5 V" -to ref_in
+set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_in
+set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_lh_out
+set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_ll_out
+set_instance_assignment -name IO_STANDARD "2.5 V" -to sig_rh_out
+set_global_assignment -name VHDL_FILE altera_pll_top_pkg.vhd
+set_global_assignment -name QIP_FILE altera_pll_top.qip
+set_global_assignment -name VHDL_FILE ../src/temp_controller_pkg.vhd
+set_global_assignment -name VHDL_FILE ../src/temp_controller.vhd
+set_global_assignment -name VHDL_FILE ../src/one_wire_pkg.vhd
+set_global_assignment -name VHDL_FILE ../src/one_wire.vhd
+set_global_assignment -name VHDL_FILE ../src/ds18b20_pkg.vhd
+set_global_assignment -name VHDL_FILE ../src/ds18b20.vhd
 set_global_assignment -name VHDL_FILE ../src/hardheat_top.vhd
 set_global_assignment -name SDC_FILE HardHeat.sdc
 set_global_assignment -name VHDL_FILE ../src/utils.vhd
@@ -85,20 +122,14 @@ set_global_assignment -name VHDL_FILE ../src/deadtime_gen_pkg.vhd
 set_global_assignment -name VHDL_FILE ../src/deadtime_gen.vhd
 set_global_assignment -name VHDL_FILE ../src/adpll_pkg.vhd
 set_global_assignment -name VHDL_FILE ../src/adpll.vhd
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_instance_assignment -name SLEW_RATE 0 -to sig_lh_out
-set_instance_assignment -name SLEW_RATE 0 -to sig_ll_out
-set_instance_assignment -name SLEW_RATE 0 -to sig_rh_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_lh_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_ll_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_rh_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to sig_rl_out
-set_instance_assignment -name SLEW_RATE 0 -to sig_rl_out
-set_location_assignment PIN_AF10 -to lock_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to lock_out
-set_instance_assignment -name SLEW_RATE 0 -to lock_out
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to ref_in
-set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to reset_in
+set_global_assignment -name CDF_FILE output_files/Chain.cdf
+set_location_assignment PIN_W25 -to mod_lvl_in[0]
+set_location_assignment PIN_V25 -to mod_lvl_in[1]
+set_location_assignment PIN_AC28 -to mod_lvl_in[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[2]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[1]
+set_instance_assignment -name IO_STANDARD "2.5 V" -to mod_lvl_in[0]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[2]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[1]
+set_instance_assignment -name CURRENT_STRENGTH_NEW "MINIMUM CURRENT" -to mod_lvl_in[0]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

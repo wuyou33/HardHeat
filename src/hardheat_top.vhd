@@ -1,8 +1,11 @@
 library ieee;
 library work;
+library altera;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.altera_pll_top_pkg.all;
 use work.hardheat_pkg.all;
+use altera.altera_syn_attributes.all;
 
 entity hardheat_top is
     generic
@@ -19,7 +22,18 @@ entity hardheat_top is
         OUT_VAL_LIMIT       : positive      := 2347483;
         LOCK_COUNT_N        : positive      := 20;
         ULOCK_COUNT_N       : positive      := 16;
-        LOCK_LIMIT          : natural       := 100
+        LOCK_LIMIT          : natural       := 100;
+        CONV_INTERVAL       : natural       := 100000000;
+        CONV_DELAY_VAL      : natural       := 75000000;
+        RESET_ON_D          : positive      := 48000;
+        RESET_SAMPLE_D      : positive      := 7000;
+        RESET_D             : positive      := 41000;
+        TX_ONE_LOW_D        : positive      := 600;
+        TX_ONE_HIGH_D       : positive      := 6400;
+        TX_ZERO_LOW_D       : positive      := 6000;
+        TX_ZERO_HIGH_D      : positive      := 1000;
+        RX_SAMPLE_D         : positive      := 900;
+        RX_RELEASE_D        : positive      := 5500
     );
     port
     (
@@ -27,6 +41,9 @@ entity hardheat_top is
         reset_in            : in std_logic;
         ref_in              : in std_logic;
         sig_in              : in std_logic;
+        ow_in               : in std_logic;
+        mod_lvl_in          : in std_logic_vector(2 downto 0);
+        ow_out              : out std_logic;
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
@@ -36,22 +53,56 @@ entity hardheat_top is
 end entity;
 
 architecture hardheat_arch_top of hardheat_top is
-    signal reset_n          : std_logic;
-    signal mod_lvl          : unsigned(2 downto 0);
-    signal mod_lvl_f        : std_logic;
+    signal clk                      : std_logic;
+    signal pll_clk                  : std_logic;
+    signal pll_locked               : std_logic;
+    signal reset                    : std_logic;
+    signal mod_lvl                  : unsigned(2 downto 0);
+    signal mod_lvl_f                : std_logic;
+    signal temp                     : signed(16 - 1 downto 0);
+    signal temp_f                   : std_logic;
+    signal temp_error               : std_logic;
+    attribute noprune               : boolean;
+    attribute noprune of temp       : signal is true;
+    attribute noprune of temp_f     : signal is true;
+    attribute noprune of temp_error : signal is true;
+    attribute preserve              : boolean;
+    attribute preserve of temp      : signal is true;
+    attribute preserve of temp_f    : signal is true;
+    attribute preserve of temp_error: signal is true;
 begin
 
-    -- Invert reset_in and sync to clk
-    reset_clk_sync_p: process(clk_in)
+    -- Main clock from PLL on the SoCkit board
+    pll_p: altera_pll_top
+    port map
+    (
+        refclk              => clk_in,
+        rst                 => not reset_in,
+        outclk_0            => pll_clk,
+        locked              => pll_locked
+    );
+
+    clk <= pll_clk;
+    reset <= not pll_locked;
+
+    -- Read modulation level state from switches on SoCkit and output new
+    -- modulation whenever their state changes
+    mod_lvl_p: process(clk, reset)
+        variable state      : unsigned(2 downto 0);
     begin
-        if rising_edge(clk_in) then
-            reset_n <= not reset_in;
+        if reset = '1' then
+            state := to_unsigned(4, mod_lvl'length);
+            mod_lvl <= to_unsigned(4, mod_lvl'length);
+            mod_lvl_f <= '0';
+        elsif rising_edge(clk) then
+            mod_lvl_f <= '0';
+            if not mod_lvl_in = std_logic_vector(state) then
+                state := unsigned(mod_lvl_in);
+                mod_lvl <= state;
+                mod_lvl_f <= '1';
+            end if;
         end if;
     end process;
-
-    -- Fix modulation level to no modulation
-    mod_lvl <= to_unsigned(4, mod_lvl'length);
-    mod_lvl_f <= '0';
 
     -- TODO: Sig is internally connected!
     hardheat_p: hardheat
@@ -69,12 +120,23 @@ begin
         OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
         LOCK_COUNT_N        => LOCK_COUNT_N,
         ULOCK_COUNT_N       => ULOCK_COUNT_N,
-        LOCK_LIMIT          => LOCK_LIMIT
+        LOCK_LIMIT          => LOCK_LIMIT,
+        CONV_INTERVAL       => CONV_INTERVAL,
+        CONV_DELAY_VAL      => CONV_DELAY_VAL,
+        RESET_ON_D          => RESET_ON_D,
+        RESET_SAMPLE_D      => RESET_SAMPLE_D,
+        RESET_D             => RESET_D,
+        TX_ONE_LOW_D        => TX_ONE_LOW_D,
+        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
+        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
+        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
+        RX_SAMPLE_D         => RX_SAMPLE_D,
+        RX_RELEASE_D        => RX_RELEASE_D
     )
     port map
     (
-        clk                 => clk_in,
-        reset               => reset_n,
+        clk                 => clk,
+        reset               => reset,
         ref_in              => ref_in,
         sig_in              => sig_in,
         mod_lvl_in          => mod_lvl,
@@ -83,7 +145,12 @@ begin
         sig_ll_out          => sig_ll_out,
         sig_rh_out          => sig_rh_out,
         sig_rl_out          => sig_rl_out,
-        lock_out            => lock_out
+        lock_out            => lock_out,
+        ow_in               => ow_in,
+        ow_out              => ow_out,
+        temp_out            => temp,
+        temp_out_f          => temp_f,
+        temp_error_out      => temp_error
     );
 
 end;

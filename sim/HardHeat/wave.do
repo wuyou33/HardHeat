@@ -13,8 +13,10 @@ add wave -noupdate /hardheat_tb/DUT_inst/sig_ll_out
 add wave -noupdate /hardheat_tb/DUT_inst/sig_rh_out
 add wave -noupdate /hardheat_tb/DUT_inst/sig_rl_out
 add wave -noupdate /hardheat_tb/DUT_inst/lock_out
+add wave -noupdate /hardheat_tb/DUT_inst/ow_out
+add wave -noupdate /hardheat_tb/DUT_inst/ow_in
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1373068963 ps} 0}
+WaveRestoreCursors {{Cursor 1} {49894492266 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 324
 configure wave -valuecolwidth 100
@@ -28,6 +30,6 @@ configure wave -gridoffset 0
 configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
-configure wave -timelineunits ps
+configure wave -timelineunits us
 update
-WaveRestoreZoom {9925781250 ps} {10003906250 ps}
+WaveRestoreZoom {0 ps} {69780439040 ps}

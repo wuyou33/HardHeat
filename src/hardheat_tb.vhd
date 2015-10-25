@@ -19,7 +19,19 @@ entity hardheat_tb is
         OUT_VAL_LIMIT       : positive      := 2347483;
         LOCK_COUNT_N        : positive      := 20;
         ULOCK_COUNT_N       : positive      := 16;
-        LOCK_LIMIT          : natural       := 100
+        LOCK_LIMIT          : natural       := 100;
+        CONV_INTERVAL       : natural       := 1000000;
+        CONV_DELAY_VAL      : natural       := 75000000;
+        RESET_ON_D          : positive      := 48000;
+        RESET_SAMPLE_D      : positive      := 7000;
+        RESET_D             : positive      := 41000;
+        TX_ONE_LOW_D        : positive      := 600;
+        TX_ONE_HIGH_D       : positive      := 6400;
+        TX_ZERO_LOW_D       : positive      := 6000;
+        TX_ZERO_HIGH_D      : positive      := 1000;
+        RX_SAMPLE_D         : positive      := 900;
+        RX_RELEASE_D        : positive      := 5500;
+        BLINK_INTERVAL      : positive      := 1000000
     );
 end entity;
 
@@ -41,6 +53,10 @@ architecture hardheat_arch_tb of hardheat_tb is
     signal mod_lvl          : unsigned(2 downto 0);
     signal mod_lvl_f        : std_logic;
 
+    -- Temperature controller related signals
+    signal ow_in            : std_logic;
+    signal ow_out           : std_logic;
+
 begin
 
     reset <= '1', '0' after 500 ns;
@@ -54,6 +70,9 @@ begin
     begin
         ref <= not ref after REF_PERIOD / 2;
     end process;
+
+    -- Just pull 1-wire bus low to indicate presence
+    ow_in <= '0';
 
     DUT_inst: hardheat
     generic map
@@ -70,7 +89,19 @@ begin
         OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
         LOCK_COUNT_N        => LOCK_COUNT_N,
         ULOCK_COUNT_N       => ULOCK_COUNT_N,
-        LOCK_LIMIT          => LOCK_LIMIT
+        LOCK_LIMIT          => LOCK_LIMIT,
+        CONV_INTERVAL       => CONV_INTERVAL,
+        CONV_DELAY_VAL      => CONV_DELAY_VAL,
+        RESET_ON_D          => RESET_ON_D,
+        RESET_SAMPLE_D      => RESET_SAMPLE_D,
+        RESET_D             => RESET_D,
+        TX_ONE_LOW_D        => TX_ONE_LOW_D,
+        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
+        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
+        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
+        RX_SAMPLE_D         => RX_SAMPLE_D,
+        RX_RELEASE_D        => RX_RELEASE_D,
+        BLINK_INTERVAL      => BLINK_INTERVAL
     )
     port map
     (
@@ -84,7 +115,9 @@ begin
         sig_lh_out          => sig_lh,
         sig_ll_out          => sig_ll,
         sig_rh_out          => sig_rh,
-        sig_rl_out          => sig_rl
+        sig_rl_out          => sig_rl,
+        ow_in               => ow_in,
+        ow_out              => ow_out
     );
 
     mod_lvl_gen: process(clk, reset)

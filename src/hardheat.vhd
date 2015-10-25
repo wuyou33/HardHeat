@@ -5,13 +5,22 @@ use ieee.numeric_std.all;
 use work.adpll_pkg.all;
 use work.epdm_pkg.all;
 use work.deadtime_gen_pkg.all;
+use work.temp_controller_pkg.all;
+use work.utils_pkg.all;
 
 entity hardheat is
     generic
     (
+        -- Number of bits in the time-to-digital counter
         COUNTER_N           : positive;
+        -- Filter number of bitshifts (left) for proportional path
         P_SHIFT_N           : natural;
+        -- Filter number of bitshifts (right) for integral path
         I_SHIFT_N           : natural;
+        -- Filter output offset and clamping value
+        OUT_OFFSET          : natural;
+        OUT_VAL_LIMIT       : positive;
+        -- Phase accumulator
         ACCUM_BITS_N        : positive;
         TUNING_WORD_N       : positive;
         INIT_OUT_VAL        : positive;
@@ -19,14 +28,26 @@ entity hardheat is
         DT_COUNTER_N        : positive;
         -- Amount of deadtime
         DT_VAL              : natural;
-        OUT_OFFSET          : natural;
-        OUT_VAL_LIMIT       : positive;
         -- Number of bits in the lock counter
         LOCK_COUNT_N        : positive;
         -- Number of bits in the unlock counter
         ULOCK_COUNT_N       : positive;
         -- Value under which the phase is considered to be locked
-        LOCK_LIMIT          : natural
+        LOCK_LIMIT          : natural;
+        -- Interval how often to measure temperature
+        CONV_INTERVAL       : natural;
+        -- Conversion delay for the sensor
+        CONV_DELAY_VAL      : natural;
+        -- 1-wire bus delays
+        RESET_ON_D          : positive;
+        RESET_SAMPLE_D      : positive;
+        RESET_D             : positive;
+        TX_ONE_LOW_D        : positive;
+        TX_ONE_HIGH_D       : positive;
+        TX_ZERO_LOW_D       : positive;
+        TX_ZERO_HIGH_D      : positive;
+        RX_SAMPLE_D         : positive;
+        RX_RELEASE_D        : positive
     );
     port
     (
@@ -36,12 +57,17 @@ entity hardheat is
         sig_in              : in std_logic;
         mod_lvl_in          : in unsigned(2 downto 0);
         mod_lvl_in_f        : in std_logic;
+        ow_in               : in std_logic;
+        ow_out              : out std_logic;
         sig_out             : out std_logic;
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
         sig_rl_out          : out std_logic;
-        lock_out            : out std_logic
+        lock_out            : out std_logic;
+        temp_out            : out signed(16 - 1 downto 0);
+        temp_out_f          : out std_logic;
+        temp_error_out      : out std_logic
     );
 end entity;
 
@@ -106,6 +132,32 @@ begin
         sig_in              => sig,
         sig_out             => deadtime,
         sig_n_out           => deadtime_n
+    );
+
+    temp_controller_p: temp_controller
+    generic map
+    (
+        CONV_INTERVAL       => CONV_INTERVAL,
+        CONV_DELAY_VAL      => CONV_DELAY_VAL,
+        RESET_ON_D          => RESET_ON_D,
+        RESET_SAMPLE_D      => RESET_SAMPLE_D,
+        RESET_D             => RESET_D,
+        TX_ONE_LOW_D        => TX_ONE_LOW_D,
+        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
+        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
+        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
+        RX_SAMPLE_D         => RX_SAMPLE_D,
+        RX_RELEASE_D        => RX_RELEASE_D
+    )
+    port map
+    (
+        clk                 => clk,
+        reset               => reset,
+        ow_in               => ow_in,
+        ow_out              => ow_out,
+        temp_out            => temp_out,
+        temp_out_f          => temp_out_f,
+        temp_error_out      => temp_error_out
     );
 
     sig_lh_out <= sig_lh and not deadtime;
