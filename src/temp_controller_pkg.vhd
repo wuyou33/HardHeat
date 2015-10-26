@@ -9,20 +9,12 @@ package temp_controller_pkg is
     component temp_controller is
         generic
         (
-            CONV_INTERVAL       : natural;
-            CONV_DELAY_VAL      : natural;
-            RESET_ON_D          : positive;
-            RESET_SAMPLE_D      : positive;
-            RESET_D             : positive;
-            TX_ONE_LOW_D        : positive;
-            TX_ONE_HIGH_D       : positive;
-            TX_ZERO_LOW_D       : positive;
-            TX_ZERO_HIGH_D      : positive;
-            RX_SAMPLE_D         : positive;
-            RX_RELEASE_D        : positive;
-            PWM_COUNTER_N       : positive;
-            MIN_MOD_LVL         : positive;
-            ENABLE_ON_D         : natural;
+            CONV_D              : natural;
+            CONV_CMD_D          : natural;
+            OW_US_D             : positive;
+            PWM_N               : positive;
+            PWM_MIN_LVL         : positive;
+            PWM_EN_ON_D         : natural;
             P_SHIFT_N           : natural;
             I_SHIFT_N           : natural;
             PID_IN_OFFSET       : integer

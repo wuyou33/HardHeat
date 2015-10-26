@@ -11,20 +11,12 @@ use work.utils_pkg.all;
 entity temp_controller is
     generic
     (
-        CONV_INTERVAL       : natural;
-        CONV_DELAY_VAL      : natural;
-        RESET_ON_D          : positive;
-        RESET_SAMPLE_D      : positive;
-        RESET_D             : positive;
-        TX_ONE_LOW_D        : positive;
-        TX_ONE_HIGH_D       : positive;
-        TX_ZERO_LOW_D       : positive;
-        TX_ZERO_HIGH_D      : positive;
-        RX_SAMPLE_D         : positive;
-        RX_RELEASE_D        : positive;
-        PWM_COUNTER_N       : positive;
-        MIN_MOD_LVL         : positive;
-        ENABLE_ON_D         : natural;
+        CONV_D              : natural;
+        CONV_CMD_D          : natural;
+        OW_US_D             : positive;
+        PWM_N               : positive;
+        PWM_MIN_LVL         : positive;
+        PWM_EN_ON_D         : natural;
         P_SHIFT_N           : natural;
         I_SHIFT_N           : natural;
         PID_IN_OFFSET       : integer
@@ -59,7 +51,7 @@ architecture temp_controller_arch of temp_controller is
     signal err_id           : unsigned(1 downto 0);
     signal crc              : std_logic_vector(8 - 1 downto 0);
     signal pwm_enable       : std_logic;
-    signal mod_lvl          : unsigned(PWM_COUNTER_N - 1 downto 0);
+    signal mod_lvl          : unsigned(PWM_N - 1 downto 0);
     signal mod_lvl_f        : std_logic;
     signal temp             : signed(16 - 1 downto 0);
     signal temp_f           : std_logic;
@@ -76,14 +68,14 @@ begin
 
     -- Perform temperature reading at predefined intervals
     conv_p: process(clk, reset)
-        variable timer      : unsigned(ceil_log2(CONV_INTERVAL) downto 0);
+        variable timer      : unsigned(ceil_log2(CONV_D) downto 0);
     begin
         if reset = '1' then
-            timer := to_unsigned(CONV_INTERVAL, timer'length);
+            timer := to_unsigned(CONV_D, timer'length);
             conv <= '0';
         elsif rising_edge(clk) then
             conv <= '0';
-            if timer < CONV_INTERVAL then
+            if timer < CONV_D then
                 timer := timer + 1;
             else
                 conv <= '1';
@@ -95,7 +87,7 @@ begin
     ds18b20_p: ds18b20
     generic map
     (
-        CONV_DELAY_VAL      => CONV_DELAY_VAL
+        CONV_DELAY_VAL      => CONV_D
     )
     port map
     (
@@ -120,15 +112,7 @@ begin
     ow_p: one_wire
     generic map
     (
-        RESET_ON_D          => RESET_ON_D,
-        RESET_SAMPLE_D      => RESET_SAMPLE_D,
-        RESET_D             => RESET_D,
-        TX_ONE_LOW_D        => TX_ONE_LOW_D,
-        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
-        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
-        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
-        RX_SAMPLE_D         => RX_SAMPLE_D,
-        RX_RELEASE_D        => RX_RELEASE_D
+        US_D                => OW_US_D
     )
     port map
     (
@@ -154,11 +138,11 @@ begin
         P_SHIFT_N           => P_SHIFT_N,
         I_SHIFT_N           => I_SHIFT_N,
         IN_N                => temp'high,
-        OUT_N               => PWM_COUNTER_N,
+        OUT_N               => PWM_N,
         INIT_OUT_VAL        => 0,
         IN_OFFSET           => PID_IN_OFFSET,
         OUT_OFFSET          => 0,
-        OUT_VAL_LIMIT       => 2**PWM_COUNTER_N - 1
+        OUT_VAL_LIMIT       => 2**PWM_N - 1
     )
     port map
     (
@@ -172,9 +156,9 @@ begin
     pwm_p: pwm
     generic map
     (
-        COUNTER_N           => PWM_COUNTER_N,
-        MIN_MOD_LVL         => MIN_MOD_LVL,
-        ENABLE_ON_D         => ENABLE_ON_D
+        COUNTER_N           => PWM_N,
+        MIN_MOD_LVL         => PWM_MIN_LVL,
+        ENABLE_ON_D         => PWM_EN_ON_D
     )
     port map
     (

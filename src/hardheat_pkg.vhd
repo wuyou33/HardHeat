@@ -6,36 +6,28 @@ package hardheat_pkg is
     component hardheat is
         generic
         (
-            COUNTER_N           : positive;
-            P_SHIFT_N           : natural;
-            I_SHIFT_N           : natural;
-            OUT_OFFSET          : natural;
-            OUT_VAL_LIMIT       : positive;
+            TDC_N               : positive;
+            FILT_P_SHIFT_N      : natural;
+            FILT_I_SHIFT_N      : natural;
+            FILT_INIT_OUT_VAL   : positive;
+            FILT_OUT_OFFSET     : natural;
+            FILT_OUT_VAL_LIMIT  : positive;
             ACCUM_BITS_N        : positive;
-            TUNING_WORD_N       : positive;
-            INIT_OUT_VAL        : positive;
-            DT_COUNTER_N        : positive;
+            ACCUM_WORD_N        : positive;
+            DT_N                : positive;
             DT_VAL              : natural;
-            LOCK_COUNT_N        : positive;
-            ULOCK_COUNT_N       : positive;
-            LOCK_LIMIT          : natural;
-            CONV_INTERVAL       : natural;
-            CONV_DELAY_VAL      : natural;
-            RESET_ON_D          : positive;
-            RESET_SAMPLE_D      : positive;
-            RESET_D             : positive;
-            TX_ONE_LOW_D        : positive;
-            TX_ONE_HIGH_D       : positive;
-            TX_ZERO_LOW_D       : positive;
-            TX_ZERO_HIGH_D      : positive;
-            RX_SAMPLE_D         : positive;
-            RX_RELEASE_D        : positive;
-            PWM_COUNTER_N       : positive;
-            MIN_MOD_LVL         : natural;
-            ENABLE_ON_D         : natural;
+            LD_LOCK_N           : positive;
+            LD_ULOCK_N          : positive;
+            LD_LOCK_LIMIT       : natural;
+            TEMP_CONV_D         : natural;
+            TEMP_CONV_CMD_D     : natural;
+            TEMP_OW_US_D        : positive;
+            TEMP_PWM_N          : positive;
+            TEMP_PWM_MIN_LVL    : natural;
+            TEMP_PWM_EN_ON_D    : natural;
             TEMP_P_SHIFT_N      : natural;
             TEMP_I_SHIFT_N      : natural;
-            PID_IN_OFFSET       : integer
+            TEMP_PID_IN_OFFSET  : integer
         );
         port
         (

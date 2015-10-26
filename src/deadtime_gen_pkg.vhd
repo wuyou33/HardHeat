@@ -6,7 +6,7 @@ package deadtime_gen_pkg is
     component deadtime_gen is
         generic
         (
-            COUNTER_N           : positive;
+            DT_N                : positive;
             DT_VAL              : natural
         );
         port

@@ -5,17 +5,17 @@ package adpll_pkg is
     component adpll is
         generic
         (
-            COUNTER_N       : positive;
-            P_SHIFT_N       : natural;
-            I_SHIFT_N       : natural;
-            ACCUM_BITS_N    : positive;
-            TUNING_WORD_N   : positive;
-            INIT_OUT_VAL    : positive;
-            OUT_OFFSET      : natural;
-            OUT_VAL_LIMIT   : positive;
-            LOCK_COUNT_N    : positive;
-            ULOCK_COUNT_N   : positive;
-            LOCK_LIMIT      : natural
+            TDC_N               : positive;
+            FILT_P_SHIFT_N      : natural;
+            FILT_I_SHIFT_N      : natural;
+            FILT_INIT_OUT_VAL   : positive;
+            FILT_OUT_OFFSET     : natural;
+            FILT_OUT_VAL_LIMIT  : positive;
+            ACCUM_BITS_N        : positive;
+            ACCUM_WORD_N        : positive;
+            LD_LOCK_N           : positive;
+            LD_ULOCK_N          : positive;
+            LD_LOCK_LIMIT       : natural
         );
         port
         (

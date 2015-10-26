@@ -11,49 +11,28 @@ use work.utils_pkg.all;
 entity hardheat is
     generic
     (
-        -- Number of bits in the time-to-digital counter
-        COUNTER_N           : positive;
-        -- Filter number of bitshifts (left) for proportional path
-        P_SHIFT_N           : natural;
-        -- Filter number of bitshifts (right) for integral path
-        I_SHIFT_N           : natural;
-        -- Filter output offset and clamping value
-        OUT_OFFSET          : natural;
-        OUT_VAL_LIMIT       : positive;
-        -- Phase accumulator
+        TDC_N               : positive;
+        FILT_P_SHIFT_N      : natural;
+        FILT_I_SHIFT_N      : natural;
+        FILT_INIT_OUT_VAL   : positive;
+        FILT_OUT_OFFSET     : natural;
+        FILT_OUT_VAL_LIMIT  : positive;
         ACCUM_BITS_N        : positive;
-        TUNING_WORD_N       : positive;
-        INIT_OUT_VAL        : positive;
-        -- Number of bits in the deadtime counter
-        DT_COUNTER_N        : positive;
-        -- Amount of deadtime
+        ACCUM_WORD_N        : positive;
+        DT_N                : positive;
         DT_VAL              : natural;
-        -- Number of bits in the lock counter
-        LOCK_COUNT_N        : positive;
-        -- Number of bits in the unlock counter
-        ULOCK_COUNT_N       : positive;
-        -- Value under which the phase is considered to be locked
-        LOCK_LIMIT          : natural;
-        -- Interval how often to measure temperature
-        CONV_INTERVAL       : natural;
-        -- Conversion delay for the sensor
-        CONV_DELAY_VAL      : natural;
-        -- 1-wire bus delays
-        RESET_ON_D          : positive;
-        RESET_SAMPLE_D      : positive;
-        RESET_D             : positive;
-        TX_ONE_LOW_D        : positive;
-        TX_ONE_HIGH_D       : positive;
-        TX_ZERO_LOW_D       : positive;
-        TX_ZERO_HIGH_D      : positive;
-        RX_SAMPLE_D         : positive;
-        RX_RELEASE_D        : positive;
-        PWM_COUNTER_N       : positive;
-        MIN_MOD_LVL         : natural;
-        ENABLE_ON_D         : natural;
+        LD_LOCK_N           : positive;
+        LD_ULOCK_N          : positive;
+        LD_LOCK_LIMIT       : natural;
+        TEMP_CONV_D         : natural;
+        TEMP_CONV_CMD_D     : natural;
+        TEMP_OW_US_D        : positive;
+        TEMP_PWM_N          : positive;
+        TEMP_PWM_MIN_LVL    : natural;
+        TEMP_PWM_EN_ON_D    : natural;
         TEMP_P_SHIFT_N      : natural;
         TEMP_I_SHIFT_N      : natural;
-        PID_IN_OFFSET       : integer
+        TEMP_PID_IN_OFFSET  : integer
     );
     port
     (
@@ -86,22 +65,23 @@ architecture hardheat_arch of hardheat is
     signal sig_ll           : std_logic;
     signal sig_rh           : std_logic;
     signal sig_rl           : std_logic;
+    signal ow               : std_logic;
 begin
 
     adpll_p: adpll
     generic map
     (
-        COUNTER_N           => COUNTER_N,
-        P_SHIFT_N           => P_SHIFT_N,
-        I_SHIFT_N           => I_SHIFT_N,
+        TDC_N               => TDC_N,
+        FILT_P_SHIFT_N      => FILT_P_SHIFT_N,
+        FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
+        FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
+        FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
+        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
         ACCUM_BITS_N        => ACCUM_BITS_N,
-        TUNING_WORD_N       => TUNING_WORD_N,
-        INIT_OUT_VAL        => INIT_OUT_VAL,
-        OUT_OFFSET          => OUT_OFFSET,
-        OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
-        LOCK_COUNT_N        => LOCK_COUNT_N,
-        ULOCK_COUNT_N       => ULOCK_COUNT_N,
-        LOCK_LIMIT          => LOCK_LIMIT
+        ACCUM_WORD_N        => ACCUM_WORD_N,
+        LD_LOCK_N           => LD_LOCK_N,
+        LD_ULOCK_N          => LD_ULOCK_N,
+        LD_LOCK_LIMIT       => LD_LOCK_LIMIT
     )
     port map
     (
@@ -129,7 +109,7 @@ begin
     deadtime_gen_p: deadtime_gen
     generic map
     (
-        COUNTER_N           => DT_COUNTER_N,
+        DT_N                => DT_N,
         DT_VAL              => DT_VAL
     )
     port map
@@ -144,23 +124,15 @@ begin
     temp_controller_p: temp_controller
     generic map
     (
-        CONV_INTERVAL       => CONV_INTERVAL,
-        CONV_DELAY_VAL      => CONV_DELAY_VAL,
-        RESET_ON_D          => RESET_ON_D,
-        RESET_SAMPLE_D      => RESET_SAMPLE_D,
-        RESET_D             => RESET_D,
-        TX_ONE_LOW_D        => TX_ONE_LOW_D,
-        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
-        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
-        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
-        RX_SAMPLE_D         => RX_SAMPLE_D,
-        RX_RELEASE_D        => RX_RELEASE_D,
-        PWM_COUNTER_N       => PWM_COUNTER_N,
-        MIN_MOD_LVL         => MIN_MOD_LVL,
-        ENABLE_ON_D         => ENABLE_ON_D,
+        CONV_D              => TEMP_CONV_D,
+        CONV_CMD_D          => TEMP_CONV_CMD_D,
+        OW_US_D             => TEMP_OW_US_D,
+        PWM_N               => TEMP_PWM_N,
+        PWM_MIN_LVL         => TEMP_PWM_MIN_LVL,
+        PWM_EN_ON_D         => TEMP_PWM_EN_ON_D,
         P_SHIFT_N           => TEMP_P_SHIFT_N,
         I_SHIFT_N           => TEMP_I_SHIFT_N,
-        PID_IN_OFFSET       => PID_IN_OFFSET
+        PID_IN_OFFSET       => TEMP_PID_IN_OFFSET
     )
     port map
     (

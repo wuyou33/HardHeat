@@ -105,15 +105,7 @@ begin
     ow_p: one_wire
     generic map
     (
-        RESET_ON_D          => 48000,
-        RESET_SAMPLE_D      => 7000,
-        RESET_D             => 41000,
-        TX_ONE_LOW_D        => 600,
-        TX_ONE_HIGH_D       => 6400,
-        TX_ZERO_LOW_D       => 6000,
-        TX_ZERO_HIGH_D      => 1000,
-        RX_SAMPLE_D         => 900,
-        RX_RELEASE_D        => 5500
+        US_D                => 100
     )
     port map
     (
@@ -146,7 +138,8 @@ begin
         crc_in              => crc,
         receive_data_f_in   => receive_data_f,
         busy_in             => busy,
-        test_temp_in        => signed(TEST_TEMP)
+        test_temp_in        => signed(TEST_TEMP),
+        test_temp_in_f      => '0'
     );
 
 end;

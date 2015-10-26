@@ -6,15 +6,7 @@ package one_wire_pkg is
     component one_wire is
         generic
         (
-            RESET_ON_D          : positive;
-            RESET_SAMPLE_D      : positive;
-            RESET_D             : positive;
-            TX_ONE_LOW_D        : positive;
-            TX_ONE_HIGH_D       : positive;
-            TX_ZERO_LOW_D       : positive;
-            TX_ZERO_HIGH_D      : positive;
-            RX_SAMPLE_D         : positive;
-            RX_RELEASE_D        : positive
+            US_D                : positive
         );
         port
         (

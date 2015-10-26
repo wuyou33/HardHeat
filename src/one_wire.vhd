@@ -7,16 +7,8 @@ use work.utils_pkg.all;
 entity one_wire is
     generic
     (
-        -- One wire delay values in counter values clocked with the main clock
-        RESET_ON_D          : positive;
-        RESET_SAMPLE_D      : positive;
-        RESET_D             : positive;
-        TX_ONE_LOW_D        : positive;
-        TX_ONE_HIGH_D       : positive;
-        TX_ZERO_LOW_D       : positive;
-        TX_ZERO_HIGH_D      : positive;
-        RX_SAMPLE_D         : positive;
-        RX_RELEASE_D        : positive
+        -- Number of clock cycles for 1us delay
+        US_D                : positive
     );
     port
     (
@@ -47,6 +39,16 @@ entity one_wire is
 end entity;
 
 architecture one_wire_arch of one_wire is
+        -- One wire bus delay values in clock cycles
+    constant RESET_ON_D     : positive  := US_D * 480;
+    constant RESET_SAMPLE_D : positive  := US_D * 70;
+    constant RESET_D        : positive  := US_D * 410;
+    constant TX_ONE_LOW_D   : positive  := US_D * 6;
+    constant TX_ONE_HIGH_D  : positive  := US_D * 64;
+    constant TX_ZERO_LOW_D  : positive  := US_D * 60;
+    constant TX_ZERO_HIGH_D : positive  := US_D * 10;
+    constant RX_SAMPLE_D    : positive  := US_D * 9;
+    constant RX_RELEASE_D   : positive  := US_D * 55;
     signal ow_reset_out     : std_logic;
     signal ow_send_out      : std_logic;
     signal ow_receive_out   : std_logic;

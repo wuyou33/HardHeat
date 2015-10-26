@@ -6,7 +6,7 @@ entity deadtime_gen is
     generic
     (
         -- Number of bits in the counter
-        COUNTER_N           : positive;
+        DT_N                : positive;
         -- Amount of deadtime
         DT_VAL              : natural
     );
@@ -24,7 +24,7 @@ architecture deadtime_gen_arch of deadtime_gen is
 begin
 
     dt_gen_p: process(clk, reset)
-        variable count      : unsigned(COUNTER_N - 1 downto 0);
+        variable count      : unsigned(DT_N - 1 downto 0);
         variable off        : std_logic;
         variable last_state : std_logic;
     begin

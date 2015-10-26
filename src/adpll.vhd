@@ -11,17 +11,17 @@ use work.lock_detector_pkg.all;
 entity adpll is
     generic
     (
-        COUNTER_N       : positive;
-        P_SHIFT_N       : natural;
-        I_SHIFT_N       : natural;
-        ACCUM_BITS_N    : positive;
-        TUNING_WORD_N   : positive;
-        INIT_OUT_VAL    : positive;
-        OUT_OFFSET      : natural;
-        OUT_VAL_LIMIT   : positive;
-        LOCK_COUNT_N    : positive;
-        ULOCK_COUNT_N   : positive;
-        LOCK_LIMIT      : natural
+        TDC_N               : positive;
+        FILT_P_SHIFT_N      : natural;
+        FILT_I_SHIFT_N      : natural;
+        FILT_INIT_OUT_VAL   : positive;
+        FILT_OUT_OFFSET     : natural;
+        FILT_OUT_VAL_LIMIT  : positive;
+        ACCUM_BITS_N        : positive;
+        ACCUM_WORD_N        : positive;
+        LD_LOCK_N           : positive;
+        LD_ULOCK_N          : positive;
+        LD_LOCK_LIMIT       : natural
     );
     port
     (
@@ -36,8 +36,8 @@ end entity;
 architecture adpll_arch of adpll is
     signal up           : std_logic;
     signal down         : std_logic;
-    signal phase_time   : signed(COUNTER_N downto 0);
-    signal tuning_word  : unsigned(TUNING_WORD_N - 1 downto 0);
+    signal phase_time   : signed(TDC_N downto 0);
+    signal tuning_word  : unsigned(ACCUM_WORD_N - 1 downto 0);
     signal sig          : std_logic;
 begin
 
@@ -57,7 +57,7 @@ begin
     tdc_p: tdc
     generic map
     (
-        COUNTER_N       => COUNTER_N
+        COUNTER_N       => TDC_N
     )
     port map
     (
@@ -71,13 +71,13 @@ begin
     filter_p: pid
     generic map
     (
-        P_SHIFT_N       => P_SHIFT_N,
-        I_SHIFT_N       => I_SHIFT_N,
-        IN_N            => COUNTER_N,
-        OUT_N           => TUNING_WORD_N,
-        INIT_OUT_VAL    => INIT_OUT_VAL,
-        OUT_OFFSET      => OUT_OFFSET,
-        OUT_VAL_LIMIT   => OUT_VAL_LIMIT,
+        P_SHIFT_N       => FILT_P_SHIFT_N,
+        I_SHIFT_N       => FILT_I_SHIFT_N,
+        IN_N            => TDC_N,
+        OUT_N           => ACCUM_WORD_N,
+        INIT_OUT_VAL    => FILT_INIT_OUT_VAL,
+        OUT_OFFSET      => FILT_OUT_OFFSET,
+        OUT_VAL_LIMIT   => FILT_OUT_VAL_LIMIT,
         IN_OFFSET       => 0
     )
     port map
@@ -93,7 +93,7 @@ begin
     generic map
     (
         ACCUM_BITS_N    => ACCUM_BITS_N,
-        TUNING_WORD_N   => TUNING_WORD_N
+        TUNING_WORD_N   => ACCUM_WORD_N
     )
     port map
     (
@@ -106,10 +106,10 @@ begin
     lock_detector_p: lock_detector
     generic map
     (
-        PHASE_TIME_IN_N => COUNTER_N,
-        LOCK_COUNT_N    => LOCK_COUNT_N,
-        ULOCK_COUNT_N   => ULOCK_COUNT_N,
-        LOCK_LIMIT      => LOCK_LIMIT
+        PHASE_TIME_IN_N => TDC_N,
+        LOCK_COUNT_N    => LD_LOCK_N,
+        ULOCK_COUNT_N   => LD_ULOCK_N,
+        LOCK_LIMIT      => LD_LOCK_LIMIT
     )
     port map
     (

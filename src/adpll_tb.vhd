@@ -23,17 +23,17 @@ begin
     DUT_inst: adpll
     generic map
     (
-        COUNTER_N               => 12,
-        P_SHIFT_N               => 7,
-        I_SHIFT_N               => 0,
+        TDC_N                   => 12,
+        FILT_P_SHIFT_N          => 7,
+        FILT_I_SHIFT_N          => 0,
         ACCUM_BITS_N            => 32,
-        TUNING_WORD_N           => 23,
-        INIT_OUT_VAL            => (2**22 - 1) / 4,
-        OUT_OFFSET              => 2**21,
-        OUT_VAL_LIMIT           => 2547483,
-        LOCK_COUNT_N            => 20,
-        ULOCK_COUNT_N           => 16,
-        LOCK_LIMIT              => 100
+        ACCUM_WORD_N            => 23,
+        FILT_INIT_OUT_VAL       => (2**22 - 1) / 4,
+        FILT_OUT_OFFSET         => 2**21,
+        FILT_OUT_VAL_LIMIT      => 2547483,
+        LD_LOCK_N               => 20,
+        LD_ULOCK_N              => 16,
+        LD_LOCK_LIMIT           => 100
     )
     port map
     (

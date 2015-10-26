@@ -13,7 +13,7 @@ add wave -noupdate /hardheat_tb/DUT_inst/sig_ll_out
 add wave -noupdate /hardheat_tb/DUT_inst/sig_rh_out
 add wave -noupdate /hardheat_tb/DUT_inst/sig_rl_out
 add wave -noupdate /hardheat_tb/DUT_inst/lock_out
-add wave -noupdate /hardheat_tb/DUT_inst/ow_out
+add wave -noupdate /hardheat_tb/ow_n_out
 add wave -noupdate /hardheat_tb/DUT_inst/ow_in
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {49894492266 ps} 0}

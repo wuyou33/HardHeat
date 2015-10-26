@@ -26,7 +26,7 @@ begin
     DUT_inst: deadtime_gen
     generic map
     (
-        COUNTER_N           => 16,
+        DT_N                => 16,
         DT_VAL              => 100
     )
     port map

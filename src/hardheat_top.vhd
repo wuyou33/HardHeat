@@ -10,36 +10,50 @@ use altera.altera_syn_attributes.all;
 entity hardheat_top is
     generic
     (
-        COUNTER_N           : positive      := 12;
-        P_SHIFT_N           : natural       := 7;
-        I_SHIFT_N           : natural       := 0;
+        -- Number of bits in time-to-digital converter
+        TDC_N               : positive      := 12;
+        -- Number of bitshifts to left for the filter proportional coefficient
+        FILT_P_SHIFT_N      : natural       := 7;
+        -- Number of bitshifts to right for the filter integral coefficient
+        FILT_I_SHIFT_N      : natural       := 0;
+        -- Initial output value from the filter
+        FILT_INIT_OUT_VAL   : positive      := 2347483;
+        -- Filter output offset
+        FILT_OUT_OFFSET     : natural       := 2**21;
+        -- Filter output value clamping limit
+        FILT_OUT_VAL_LIMIT  : positive      := 2347483;
+        -- Number of bits in the phase accumulator
         ACCUM_BITS_N        : positive      := 32;
-        TUNING_WORD_N       : positive      := 23;
-        INIT_OUT_VAL        : positive      := 2347483;
-        DT_COUNTER_N        : positive      := 16;
+        -- Number of bits in the tuning word for the phase accumulator
+        ACCUM_WORD_N        : positive      := 23;
+        -- Number of bits in the deadtime counter
+        DT_N                : positive      := 16;
+        -- Amount of deadtime in clock cycles
         DT_VAL              : natural       := 100;
-        OUT_OFFSET          : natural       := 2**21;
-        OUT_VAL_LIMIT       : positive      := 2347483;
-        LOCK_COUNT_N        : positive      := 20;
-        ULOCK_COUNT_N       : positive      := 16;
-        LOCK_LIMIT          : natural       := 100;
-        CONV_INTERVAL       : natural       := 100000000;
-        CONV_DELAY_VAL      : natural       := 75000000;
-        RESET_ON_D          : positive      := 48000;
-        RESET_SAMPLE_D      : positive      := 7000;
-        RESET_D             : positive      := 41000;
-        TX_ONE_LOW_D        : positive      := 600;
-        TX_ONE_HIGH_D       : positive      := 6400;
-        TX_ZERO_LOW_D       : positive      := 6000;
-        TX_ZERO_HIGH_D      : positive      := 1000;
-        RX_SAMPLE_D         : positive      := 900;
-        RX_RELEASE_D        : positive      := 5500;
-        PWM_COUNTER_N       : positive      := 12;
-        MIN_MOD_LVL         : natural       := 2**12 / 5;
-        ENABLE_ON_D         : natural       := 200000000;
+        -- Number of bits in the lock detector "locked" counter
+        LD_LOCK_N           : positive      := 20;
+        -- Number of bits in the lock detector "unlocked" counter
+        LD_ULOCK_N          : positive      := 16;
+        -- Phase difference value under which we are considered to be locked
+        LD_LOCK_LIMIT       : natural       := 100;
+        -- Temperature conversion interval in clock cycles
+        TEMP_CONV_D         : natural       := 100000000;
+        -- Delay between conversion command and reading in clock cycles
+        TEMP_CONV_CMD_D     : natural       := 75000000;
+        -- Number of clock cycles for 1us delay for the 1-wire module
+        TEMP_OW_US_D        : positive      := 100;
+        -- Number of bits in the temperature PWM controller
+        TEMP_PWM_N          : positive      := 12;
+        -- Minimum PWM level (duty cycle)
+        TEMP_PWM_MIN_LVL    : natural       := 2**12 / 5;
+        -- Delay for outputting maximum duty cycle on enable
+        TEMP_PWM_EN_ON_D    : natural       := 200000000;
+        -- Number of bitshifts to left for the PID-filter proportional coeff
         TEMP_P_SHIFT_N      : natural       := 4;
+        -- Number of bitshifts to right for the PID-filter integral coeff
         TEMP_I_SHIFT_N      : natural       := 11;
-        PID_IN_OFFSET       : integer       := -320
+        -- PID input offset applied to the temperature sensor output
+        TEMP_PID_IN_OFFSET  : integer       := -320
     );
     port
     (
@@ -115,36 +129,28 @@ begin
     hardheat_p: hardheat
     generic map
     (
-        COUNTER_N           => COUNTER_N,
-        P_SHIFT_N           => P_SHIFT_N,
-        I_SHIFT_N           => I_SHIFT_N,
+        TDC_N               => TDC_N,
+        FILT_P_SHIFT_N      => FILT_P_SHIFT_N,
+        FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
+        FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
+        FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
+        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
         ACCUM_BITS_N        => ACCUM_BITS_N,
-        TUNING_WORD_N       => TUNING_WORD_N,
-        INIT_OUT_VAL        => INIT_OUT_VAL,
-        DT_COUNTER_N        => DT_COUNTER_N,
+        ACCUM_WORD_N        => ACCUM_WORD_N,
+        LD_LOCK_N           => LD_LOCK_N,
+        LD_ULOCK_N          => LD_ULOCK_N,
+        LD_LOCK_LIMIT       => LD_LOCK_LIMIT,
+        DT_N                => DT_N,
         DT_VAL              => DT_VAL,
-        OUT_OFFSET          => OUT_OFFSET,
-        OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
-        LOCK_COUNT_N        => LOCK_COUNT_N,
-        ULOCK_COUNT_N       => ULOCK_COUNT_N,
-        LOCK_LIMIT          => LOCK_LIMIT,
-        CONV_INTERVAL       => CONV_INTERVAL,
-        CONV_DELAY_VAL      => CONV_DELAY_VAL,
-        RESET_ON_D          => RESET_ON_D,
-        RESET_SAMPLE_D      => RESET_SAMPLE_D,
-        RESET_D             => RESET_D,
-        TX_ONE_LOW_D        => TX_ONE_LOW_D,
-        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
-        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
-        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
-        RX_SAMPLE_D         => RX_SAMPLE_D,
-        RX_RELEASE_D        => RX_RELEASE_D,
-        PWM_COUNTER_N       => PWM_COUNTER_N,
-        MIN_MOD_LVL         => MIN_MOD_LVL,
-        ENABLE_ON_D         => ENABLE_ON_D,
+        TEMP_CONV_D         => TEMP_CONV_D,
+        TEMP_CONV_CMD_D     => TEMP_CONV_CMD_D,
+        TEMP_OW_US_D        => TEMP_OW_US_D,
+        TEMP_PWM_N          => TEMP_PWM_N,
+        TEMP_PWM_MIN_LVL    => TEMP_PWM_MIN_LVL,
+        TEMP_PWM_EN_ON_D    => TEMP_PWM_EN_ON_D,
         TEMP_P_SHIFT_N      => TEMP_P_SHIFT_N,
         TEMP_I_SHIFT_N      => TEMP_I_SHIFT_N,
-        PID_IN_OFFSET       => PID_IN_OFFSET
+        TEMP_PID_IN_OFFSET  => TEMP_PID_IN_OFFSET
     )
     port map
     (

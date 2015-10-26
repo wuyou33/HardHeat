@@ -42,20 +42,12 @@ begin
     DUT_inst: temp_controller
     generic map
     (
-        CONV_INTERVAL       => 1000000,
-        CONV_DELAY_VAL      => 100000,
-        RESET_ON_D          => 48000,
-        RESET_SAMPLE_D      => 7000,
-        RESET_D             => 41000,
-        TX_ONE_LOW_D        => 600,
-        TX_ONE_HIGH_D       => 6400,
-        TX_ZERO_LOW_D       => 6000,
-        TX_ZERO_HIGH_D      => 1000,
-        RX_SAMPLE_D         => 900,
-        RX_RELEASE_D        => 5500,
-        PWM_COUNTER_N       => 12,
-        MIN_MOD_LVL         => 2**12 / 4,
-        ENABLE_ON_D         => 100,
+        CONV_D              => 1000000,
+        CONV_CMD_D          => 100000,
+        OW_US_D             => 100,
+        PWM_N               => 12,
+        PWM_MIN_LVL         => 2**12 / 4,
+        PWM_EN_ON_D         => 100,
         P_SHIFT_N           => 4,
         I_SHIFT_N           => 11,
         PID_IN_OFFSET       => -320

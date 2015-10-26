@@ -7,31 +7,28 @@ use work.hardheat_pkg.all;
 entity hardheat_tb is
     generic
     (
-        COUNTER_N           : positive      := 12;
-        P_SHIFT_N           : natural       := 7;
-        I_SHIFT_N           : natural       := 0;
+        TDC_N               : positive      := 12;
+        FILT_P_SHIFT_N      : natural       := 7;
+        FILT_I_SHIFT_N      : natural       := 0;
+        FILT_INIT_OUT_VAL   : positive      := 2347483;
+        FILT_OUT_OFFSET     : natural       := 2**21;
+        FILT_OUT_VAL_LIMIT  : positive      := 2347483;
         ACCUM_BITS_N        : positive      := 32;
-        TUNING_WORD_N       : positive      := 23;
-        INIT_OUT_VAL        : positive      := 2347483;
-        DT_COUNTER_N        : positive      := 16;
+        ACCUM_WORD_N        : positive      := 23;
+        DT_N                : positive      := 16;
         DT_VAL              : natural       := 100;
-        OUT_OFFSET          : natural       := 2**21;
-        OUT_VAL_LIMIT       : positive      := 2347483;
-        LOCK_COUNT_N        : positive      := 20;
-        ULOCK_COUNT_N       : positive      := 16;
-        LOCK_LIMIT          : natural       := 100;
-        CONV_INTERVAL       : natural       := 1000000;
-        CONV_DELAY_VAL      : natural       := 75000000;
-        RESET_ON_D          : positive      := 48000;
-        RESET_SAMPLE_D      : positive      := 7000;
-        RESET_D             : positive      := 41000;
-        TX_ONE_LOW_D        : positive      := 600;
-        TX_ONE_HIGH_D       : positive      := 6400;
-        TX_ZERO_LOW_D       : positive      := 6000;
-        TX_ZERO_HIGH_D      : positive      := 1000;
-        RX_SAMPLE_D         : positive      := 900;
-        RX_RELEASE_D        : positive      := 5500;
-        BLINK_INTERVAL      : positive      := 1000000
+        LD_LOCK_N           : positive      := 20;
+        LD_ULOCK_N          : positive      := 16;
+        LD_LOCK_LIMIT       : natural       := 100;
+        TEMP_CONV_D         : natural       := 1000000;
+        TEMP_CONV_CMD_D     : natural       := 750000;
+        TEMP_OW_US_D        : positive      := 100;
+        TEMP_PWM_N          : positive      := 12;
+        TEMP_PWM_MIN_LVL    : natural       := 2**12 / 5;
+        TEMP_PWM_EN_ON_D    : natural       := 2000000;
+        TEMP_P_SHIFT_N      : natural       := 4;
+        TEMP_I_SHIFT_N      : natural       := 11;
+        TEMP_PID_IN_OFFSET  : integer       := -320
     );
 end entity;
 
@@ -56,6 +53,7 @@ architecture hardheat_arch_tb of hardheat_tb is
     -- Temperature controller related signals
     signal ow_in            : std_logic;
     signal ow_out           : std_logic;
+    signal ow_n_out         : std_logic;
 
 begin
 
@@ -74,34 +72,34 @@ begin
     -- Just pull 1-wire bus low to indicate presence
     ow_in <= '0';
 
+    -- Invert bus state for display
+    ow_n_out <= not ow_out;
+
     DUT_inst: hardheat
     generic map
     (
-        COUNTER_N           => COUNTER_N,
-        P_SHIFT_N           => P_SHIFT_N,
-        I_SHIFT_N           => I_SHIFT_N,
+        TDC_N               => TDC_N,
+        FILT_P_SHIFT_N      => FILT_P_SHIFT_N,
+        FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
+        FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
+        FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
+        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
         ACCUM_BITS_N        => ACCUM_BITS_N,
-        TUNING_WORD_N       => TUNING_WORD_N,
-        INIT_OUT_VAL        => INIT_OUT_VAL,
-        DT_COUNTER_N        => DT_COUNTER_N,
+        ACCUM_WORD_N        => ACCUM_WORD_N,
+        LD_LOCK_N           => LD_LOCK_N,
+        LD_ULOCK_N          => LD_ULOCK_N,
+        LD_LOCK_LIMIT       => LD_LOCK_LIMIT,
+        DT_N                => DT_N,
         DT_VAL              => DT_VAL,
-        OUT_OFFSET          => OUT_OFFSET,
-        OUT_VAL_LIMIT       => OUT_VAL_LIMIT,
-        LOCK_COUNT_N        => LOCK_COUNT_N,
-        ULOCK_COUNT_N       => ULOCK_COUNT_N,
-        LOCK_LIMIT          => LOCK_LIMIT,
-        CONV_INTERVAL       => CONV_INTERVAL,
-        CONV_DELAY_VAL      => CONV_DELAY_VAL,
-        RESET_ON_D          => RESET_ON_D,
-        RESET_SAMPLE_D      => RESET_SAMPLE_D,
-        RESET_D             => RESET_D,
-        TX_ONE_LOW_D        => TX_ONE_LOW_D,
-        TX_ONE_HIGH_D       => TX_ONE_HIGH_D,
-        TX_ZERO_LOW_D       => TX_ZERO_LOW_D,
-        TX_ZERO_HIGH_D      => TX_ZERO_HIGH_D,
-        RX_SAMPLE_D         => RX_SAMPLE_D,
-        RX_RELEASE_D        => RX_RELEASE_D,
-        BLINK_INTERVAL      => BLINK_INTERVAL
+        TEMP_CONV_D         => TEMP_CONV_D,
+        TEMP_CONV_CMD_D     => TEMP_CONV_CMD_D,
+        TEMP_OW_US_D        => TEMP_OW_US_D,
+        TEMP_PWM_N          => TEMP_PWM_N,
+        TEMP_PWM_MIN_LVL    => TEMP_PWM_MIN_LVL,
+        TEMP_PWM_EN_ON_D    => TEMP_PWM_EN_ON_D,
+        TEMP_P_SHIFT_N      => TEMP_P_SHIFT_N,
+        TEMP_I_SHIFT_N      => TEMP_I_SHIFT_N,
+        TEMP_PID_IN_OFFSET  => TEMP_PID_IN_OFFSET
     )
     port map
     (
