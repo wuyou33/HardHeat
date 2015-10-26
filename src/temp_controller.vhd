@@ -87,7 +87,7 @@ begin
     ds18b20_p: ds18b20
     generic map
     (
-        CONV_DELAY_VAL      => CONV_D
+        CONV_DELAY_VAL      => CONV_CMD_D
     )
     port map
     (

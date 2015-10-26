@@ -69,7 +69,8 @@ entity hardheat_top is
         sig_rh_out          : out std_logic;
         sig_rl_out          : out std_logic;
         lock_out            : out std_logic;
-        pwm_out             : out std_logic
+        pwm_out             : out std_logic;
+        temp_err_out        : out std_logic
     );
 end entity;
 
@@ -82,15 +83,12 @@ architecture hardheat_arch_top of hardheat_top is
     signal mod_lvl_f                : std_logic;
     signal temp                     : signed(16 - 1 downto 0);
     signal temp_f                   : std_logic;
-    signal temp_error               : std_logic;
     attribute noprune               : boolean;
     attribute noprune of temp       : signal is true;
     attribute noprune of temp_f     : signal is true;
-    attribute noprune of temp_error : signal is true;
     attribute preserve              : boolean;
     attribute preserve of temp      : signal is true;
     attribute preserve of temp_f    : signal is true;
-    attribute preserve of temp_error: signal is true;
 begin
 
     -- Main clock from PLL on the SoCkit board
@@ -169,8 +167,8 @@ begin
         ow_out              => ow_out,
         temp_out            => temp,
         temp_out_f          => temp_f,
-        temp_error_out      => temp_error,
-        pwm_out             => pwm_out
+        pwm_out             => pwm_out,
+        temp_err_out        => temp_err_out
     );
 
 end;

@@ -32,7 +32,7 @@ begin
         type pwm_state is (idle, enable_on_delay, pwm);
         variable state          : pwm_state;
         variable timer          : unsigned(COUNTER_N - 1 downto 0);
-        variable cycles         : unsigned(ceil_log2(ENABLE_ON_D) - 1 downto 0);
+        variable cycles         : unsigned(ceil_log2(ENABLE_ON_D) downto 0);
         variable mod_lvl        : unsigned(COUNTER_N - 1 downto 0);
     begin
         if reset = '1' then

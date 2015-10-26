@@ -62,7 +62,7 @@ architecture one_wire_arch of one_wire is
 begin
 
     -- Invert and combine signals so application logic matches bus state
-    ow_out <= not ow_reset_out or not ow_send_out or not ow_receive_out;
+    ow_out <= not (not ow_reset_out or not ow_send_out or not ow_receive_out);
     -- Combine process-specific busy signals
     busy_out <= busy_reset or busy_send or busy_receive;
 
@@ -100,12 +100,10 @@ begin
                     state := reset_on;
                     ow_reset_out <= '0';
                     busy_reset <= '1';
-                    crc_reset <= '1';
                 else
                     busy_reset <= '0';
                 end if;
             elsif state = reset_on then
-                crc_reset <= '0';
                 if timer < RESET_ON_D then
                     timer := timer + 1;
                 else
@@ -239,11 +237,14 @@ begin
             data_out_f <= '0';
             last_bit <= '0';
             last_bit_f <= '0';
+            crc_reset <= '0';
         elsif rising_edge(clk) then
             if state = idle then
                 -- Reset data out indicator strobe
                 data_out_f <= '0';
+                crc_reset <= '1';
                 if receive_data_f = '1' then
+                    crc_reset <= '1';
                     -- Pull bus low
                     ow_receive_out <= '0';
                     busy_receive <= '1';
@@ -308,16 +309,16 @@ begin
             crc := (others => '0');
             crc_out <= (others => '0');
         elsif rising_edge(clk) then
+            if crc_reset = '1' then
+                crc := (others => '0');
+                crc_out <= (others => '0');
+            end if;
             if last_bit_f = '1' then
                 crc(crc'left) := last_bit xor crc(crc'right);
                 crc(4) := crc(3) xor crc(crc'left);
                 crc(5) := crc(4) xor crc(crc'left);
                 crc := shift_left_vec(crc, 1);
                 crc_out <= crc;
-            end if;
-            if crc_reset = '1' then
-                crc := (others => '0');
-                crc_out <= (others => '0');
             end if;
         end if;
     end process;

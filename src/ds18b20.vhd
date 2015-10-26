@@ -45,6 +45,7 @@ begin
             std_logic_vector(8 - 1 downto 0);
         variable state          : ds18b20_state;
         variable next_state     : ds18b20_state;
+        variable next_cmd       : ds18b20_state;
         variable data           : data_array;
         variable bytes_left     : unsigned(ceil_log2(data_in'length) downto 0);
         variable busy_state     : std_logic;
@@ -53,6 +54,7 @@ begin
         if reset = '1' then
             state := idle;
             next_state := idle;
+            next_cmd := conv_cmd;
             reset_ow_out <= '0';
             busy_state := '0';
             receive_data_out_f <= '0';
@@ -96,7 +98,7 @@ begin
                 data_out <= DS18B20_ROM_CMD;
                 data_out_f <= '1';
                 state := wait_busy;
-                next_state := conv_cmd;
+                next_state := next_cmd;
             elsif state = conv_cmd then
                 data_out <= DS18B20_CONV_CMD;
                 data_out_f <= '1';
@@ -108,12 +110,15 @@ begin
                     timer := timer + 1;
                 else
                     timer := (others => '0');
-                    state := read_cmd;
+                    next_cmd := read_cmd;
+                    reset_ow_out <= '1';
+                    state := reset_ow;
                 end if;
             elsif state = read_cmd then
                 data_out <= DS18B20_READ_CMD;
                 data_out_f <= '1';
                 state := wait_busy;
+                next_cmd := conv_cmd;
                 next_state := start_read;
             elsif state = start_read then
                 receive_data_out_f <= '1';

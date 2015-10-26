@@ -28,7 +28,6 @@ architecture ds18b20_tb_arch of ds18b20_tb is
     signal reset_ow         : std_logic;
     signal ow_in            : std_logic;
     signal ow_out           : std_logic;
-    signal ow_n_out         : std_logic;
     signal data_in          : std_logic_vector(8 - 1 downto 0);
     signal data_in_f        : std_logic;
     signal receive_data_f   : std_logic;
@@ -54,10 +53,6 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
-    -- Invert the output signal coming from the 1-wire module for display
-    ow_out <= not ow_n_out;
-
-
     -- Perform temperature reading at predefined intervals
     conv_p: process(clk, reset)
         variable timer      : unsigned(ceil_log2(CONV_INTERVAL) downto 0);
@@ -73,6 +68,22 @@ begin
                 conv <= '1';
                 timer := (others => '0');
             end if;
+        end if;
+    end process;
+
+    -- Verify CRC after doing one full conversion
+    assert_crc: process(temp_f)
+    begin
+        if rising_edge(temp_f) then
+            assert crc = x"00" report "CRC error!" severity failure;
+        end if;
+    end process;
+
+    -- Verify we do not encounter a temp error
+    process(clk, reset)
+    begin
+        if rising_edge(clk) and not reset = '1' then
+            assert temp_error = '0' report "Temp error!" severity failure;
         end if;
     end process;
 
@@ -116,7 +127,7 @@ begin
         data_in             => data_in,
         data_in_f           => data_in_f,
         receive_data_f      => receive_data_f,
-        ow_out              => ow_n_out,
+        ow_out              => ow_out,
         error_out           => err,
         error_id_out        => err_id,
         busy_out            => busy,
@@ -126,20 +137,18 @@ begin
     );
 
     data_gen: ds18b20_data_gen
+    generic map
+    (
+        MICROSECOND_D       => 100
+    )
     port map
     (
         clk                 => clk,
         reset               => reset,
         ow_in               => ow_in,
-        temp_in             => temp,
-        temp_in_f           => temp_f,
         ow_out              => ow_out,
-        conv_in             => conv,
-        crc_in              => crc,
-        receive_data_f_in   => receive_data_f,
-        busy_in             => busy,
-        test_temp_in        => signed(TEST_TEMP),
-        test_temp_in_f      => '0'
+        temp_in             => signed(TEST_TEMP),
+        temp_in_f           => '0'
     );
 
 end;

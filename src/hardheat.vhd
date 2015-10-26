@@ -52,7 +52,7 @@ entity hardheat is
         lock_out            : out std_logic;
         temp_out            : out signed(16 - 1 downto 0);
         temp_out_f          : out std_logic;
-        temp_error_out      : out std_logic;
+        temp_err_out        : out std_logic;
         pwm_out             : out std_logic
     );
 end entity;
@@ -142,9 +142,9 @@ begin
         ow_out              => ow_out,
         temp_out            => temp_out,
         temp_out_f          => temp_out_f,
-        temp_error_out      => temp_error_out,
         pwm_out             => pwm_out,
-        enable_in           => '1'
+        enable_in           => '1',
+        temp_error_out      => temp_err_out
     );
 
     sig_lh_out <= sig_lh and not deadtime;

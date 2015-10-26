@@ -11,4 +11,5 @@ set_false_path -to [get_ports sig_rh_out]
 set_false_path -to [get_ports sig_rl_out]
 set_false_path -to [get_ports lock_out]
 set_false_path -to [get_ports pwm_out]
+set_false_path -to [get_ports temp_err_out]
 derive_pll_clocks
