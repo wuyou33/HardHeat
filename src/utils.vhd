@@ -9,6 +9,14 @@ package utils_pkg is
         return std_logic_vector;
     function shift_left_vec(Arg : std_logic_vector; Num : positive)
         return std_logic_vector;
+    function shift_right_vec(   Arg : std_logic_vector;
+                                Num : positive;
+                                NewBit : std_logic)
+        return std_logic_vector;
+    function shift_left_vec(    Arg : std_logic_vector;
+                                Num : positive;
+                                NewBit : std_logic)
+        return std_logic_vector;
 end package;
 
 package body utils_pkg is
@@ -54,5 +62,29 @@ package body utils_pkg is
         return std_logic_vector is
     begin
         return(std_logic_vector(shift_left(unsigned(Arg), Num)));
+    end function;
+	---------------------------------------------------------------------------
+	-- Shift an std_logic_vector right and put new bit to 'high
+	---------------------------------------------------------------------------
+    function shift_right_vec(   Arg : std_logic_vector;
+                                Num : positive;
+                                NewBit : std_logic) return std_logic_vector is
+        variable vec        : std_logic_vector(Arg'range);
+    begin
+        vec := std_logic_vector(shift_right(unsigned(Arg), Num));
+        vec(vec'high) := NewBit;
+        return(vec);
+    end function;
+	---------------------------------------------------------------------------
+	-- Shift an std_logic_vector left and put new bit to 'low
+	---------------------------------------------------------------------------
+    function shift_left_vec(    Arg : std_logic_vector;
+                                Num : positive;
+                                NewBit : std_logic) return std_logic_vector is
+        variable vec        : std_logic_vector(Arg'range);
+    begin
+        vec := std_logic_vector(shift_left(unsigned(Arg), Num));
+        vec(vec'low) := NewBit;
+        return(vec);
     end function;
 end package body;

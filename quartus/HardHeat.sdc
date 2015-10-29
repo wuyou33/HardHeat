@@ -13,3 +13,32 @@ set_false_path -to [get_ports lock_out]
 set_false_path -to [get_ports pwm_out]
 set_false_path -to [get_ports temp_err_out]
 derive_pll_clocks
+
+# JTAG signal constraints, needed for SignalTap
+# Constrain the TCK port
+create_clock \
+-name tck \
+-period "10MHz" \
+-add \
+[get_ports altera_reserved_tck]
+
+# Cut all paths to and from tck
+set_clock_groups -exclusive -group [get_clocks tck]
+
+# TDI port
+set_input_delay \
+-clock tck \
+20 \
+[get_ports altera_reserved_tdi]
+
+# TMS port
+set_input_delay \
+-clock tck \
+20 \
+[get_ports altera_reserved_tms]
+
+# TDO port
+set_output_delay \
+-clock tck \
+20 \
+[get_ports altera_reserved_tdo]

@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.altera_pll_top_pkg.all;
 use work.hardheat_pkg.all;
+use work.debounce_pkg.all;
 use altera.altera_syn_attributes.all;
 
 entity hardheat_top is
@@ -53,7 +54,9 @@ entity hardheat_top is
         -- Number of bitshifts to right for the PID-filter integral coeff
         TEMP_I_SHIFT_N      : natural       := 11;
         -- PID input offset applied to the temperature sensor output
-        TEMP_PID_IN_OFFSET  : integer       := -320
+        TEMP_PID_IN_OFFSET  : integer       := -320;
+        DEBOUNCE_D          : natural       := 1000000;
+        DEBOUNCE_FF_N       : natural       := 5
     );
     port
     (
@@ -75,20 +78,24 @@ entity hardheat_top is
 end entity;
 
 architecture hardheat_arch_top of hardheat_top is
+    attribute noprune               : boolean;
+    attribute preserve              : boolean;
+    attribute keep                  : boolean;
     signal clk                      : std_logic;
+    attribute noprune of clk        : signal is true;
+    attribute keep of clk           : signal is true;
+    signal temp                     : signed(16 - 1 downto 0);
+    signal temp_f                   : std_logic;
+    attribute noprune of temp       : signal is true;
+    attribute noprune of temp_f     : signal is true;
+    attribute preserve of temp      : signal is true;
+    attribute preserve of temp_f    : signal is true;
     signal pll_clk                  : std_logic;
     signal pll_locked               : std_logic;
     signal reset                    : std_logic;
-    signal mod_lvl                  : unsigned(2 downto 0);
+    signal mod_lvl                  : std_logic_vector(mod_lvl_in'range);
     signal mod_lvl_f                : std_logic;
-    signal temp                     : signed(16 - 1 downto 0);
-    signal temp_f                   : std_logic;
-    attribute noprune               : boolean;
-    attribute noprune of temp       : signal is true;
-    attribute noprune of temp_f     : signal is true;
-    attribute preserve              : boolean;
-    attribute preserve of temp      : signal is true;
-    attribute preserve of temp_f    : signal is true;
+    signal debounced_sws            : std_logic_vector(mod_lvl_in'range);
 begin
 
     -- Main clock from PLL on the SoCkit board
@@ -104,19 +111,35 @@ begin
     clk <= pll_clk;
     reset <= not pll_locked;
 
-    -- Read modulation level state from switches on SoCkit and output new
-    -- modulation whenever their state changes
+    -- Read modulation level state from switches, debounce
+    debouncing_p: for i in 0 to mod_lvl_in'high generate
+    debouncer_p: debounce
+    generic map
+    (
+        DEBOUNCE_D          => DEBOUNCE_D,
+        FLIPFLOPS_N         => DEBOUNCE_FF_N
+    )
+    port map
+    (
+        clk                 => clk,
+        reset               => reset,
+        sig_in              => mod_lvl_in(i),
+        sig_out             => debounced_sws(i)
+    );
+    end generate;
+
+    -- Change modulation level when debounced modulation level changes
     mod_lvl_p: process(clk, reset)
-        variable state      : unsigned(2 downto 0);
+        variable state      : std_logic_vector(mod_lvl_in'high downto 0);
     begin
         if reset = '1' then
-            state := to_unsigned(4, mod_lvl'length);
-            mod_lvl <= to_unsigned(4, mod_lvl'length);
+            state := (others => '1');
+            mod_lvl <= state;
             mod_lvl_f <= '0';
         elsif rising_edge(clk) then
             mod_lvl_f <= '0';
-            if not mod_lvl_in = std_logic_vector(state) then
-                state := unsigned(mod_lvl_in);
+            if not debounced_sws = state then
+                state := debounced_sws;
                 mod_lvl <= state;
                 mod_lvl_f <= '1';
             end if;
@@ -156,7 +179,7 @@ begin
         reset               => reset,
         ref_in              => ref_in,
         sig_in              => sig_in,
-        mod_lvl_in          => mod_lvl,
+        mod_lvl_in          => unsigned(mod_lvl),
         mod_lvl_in_f        => mod_lvl_f,
         sig_lh_out          => sig_lh_out,
         sig_ll_out          => sig_ll_out,
