@@ -31,11 +31,7 @@ entity temp_controller is
         temp_out            : out signed(16 - 1 downto 0);
         temp_out_f          : out std_logic;
         temp_error_out      : out std_logic;
-        pwm_out             : out std_logic;
-        conv_out            : out std_logic;
-        crc_out             : out std_logic_vector(8 - 1 downto 0);
-        receive_data_out_f  : out std_logic;
-        busy_out            : out std_logic
+        pwm_out             : out std_logic
     );
 end entity;
 
@@ -60,11 +56,6 @@ begin
 
     temp_out <= temp;
     temp_out_f <= temp_f;
-    -- These are mainly for simulation
-    conv_out <= conv;
-    crc_out <= crc;
-    receive_data_out_f <= receive_data_f;
-    busy_out <= busy;
 
     -- Perform temperature reading at predefined intervals
     conv_p: process(clk, reset)

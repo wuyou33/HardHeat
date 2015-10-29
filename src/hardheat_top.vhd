@@ -167,8 +167,8 @@ begin
         ow_out              => ow_out,
         temp_out            => temp,
         temp_out_f          => temp_f,
-        pwm_out             => pwm_out,
-        temp_err_out        => temp_err_out
+        temp_err_out        => temp_err_out,
+        pwm_out             => pwm_out
     );
 
 end;

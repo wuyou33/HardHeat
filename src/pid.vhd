@@ -56,7 +56,12 @@ begin
             last_state := '0';
         elsif rising_edge(clk) then
             if not upd_clk_in = last_state and upd_clk_in = '1' then
-                shift_in := pid_in + to_signed(IN_OFFSET, pid_in'length);
+                -- Limit shifted value to positive
+                if pid_in + to_signed(IN_OFFSET, pid_in'length) < 0 then
+                    shift_in := to_signed(0, shift_in'length);
+                else
+                    shift_in := pid_in + to_signed(IN_OFFSET, pid_in'length);
+                end if;
                 prop := shift_left(resize(shift_in, prop'length), P_SHIFT_N);
                 integral := integral + resize(shift_in, integral'length);
                 sum := resize(prop, sum'length)

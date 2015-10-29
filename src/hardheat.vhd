@@ -65,7 +65,6 @@ architecture hardheat_arch of hardheat is
     signal sig_ll           : std_logic;
     signal sig_rh           : std_logic;
     signal sig_rl           : std_logic;
-    signal ow               : std_logic;
 begin
 
     adpll_p: adpll
