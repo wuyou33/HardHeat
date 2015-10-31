@@ -13,10 +13,11 @@ HardHeat currently consists of:
   - Deadtime generator (static deadtime value)
   - Enchanced pulse density modulator based on [*2*] for adjusting power level
     - For power factor correction, not implemented yet
+    - Supports switch pair alternation, preventing a single pair from being on indefinitely (can be a problem with bootstrap gate drivers)
   - Temperature controller component
     - 1-wire controller, read temperature from a DS18B20 sensor
     - PID-controller
-    - PWM-controller for a fan
+    - PWM-controller for a fan, with start-up max. duty cycle delay and min. duty cycle limit
 
 This GitHub repository contains all the required components and the associated test benches for each component. Also ModelSim project files and waveform setup scripts are included.
 

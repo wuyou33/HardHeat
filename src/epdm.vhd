@@ -27,6 +27,7 @@ begin
         variable count          : unsigned(3 downto 0);
         variable last_state     : std_logic;
         variable skip           : std_logic;
+        variable alternate      : std_logic;
     begin
         if reset = '1' then
             sig_lh_out <= '0';
@@ -35,6 +36,7 @@ begin
             sig_rl_out <= '0';
             count := (others => '0');
             last_state := '0';
+            alternate := '0';
             skip := '1';
         elsif rising_edge(clk) then
             -- New modulation level, reset counter
@@ -82,6 +84,10 @@ begin
                 end if;
                 -- Reset counter
                 if count = 12 then
+                    -- Alternate switch pairs so one pair is not constantly on
+                    if count mod 2 = 0 then
+                        alternate := not alternate;
+                    end if;
                     count := (others => '0');
                 end if;
             end if;
@@ -91,10 +97,10 @@ begin
                 sig_rh_out <= '0';
                 sig_rl_out <= '1';
             else
-                sig_lh_out <= sig_in;
-                sig_ll_out <= not sig_in;
-                sig_rh_out <= not sig_in;
-                sig_rl_out <= sig_in;
+                sig_lh_out <= sig_in xor alternate;
+                sig_ll_out <= not sig_in xor alternate;
+                sig_rh_out <= not sig_in xor alternate;
+                sig_rl_out <= sig_in xor alternate;
             end if;
             last_state := sig_in;
         end if;
