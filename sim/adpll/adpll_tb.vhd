@@ -23,14 +23,14 @@ begin
     DUT_inst: adpll
     generic map
     (
-        TDC_N                   => 12,
-        FILT_P_SHIFT_N          => 7,
-        FILT_I_SHIFT_N          => 0,
+        TDC_N                   => 13,
+        FILT_P_SHIFT_N          => 0,
+        FILT_I_SHIFT_N          => -5,
         ACCUM_BITS_N            => 32,
         ACCUM_WORD_N            => 23,
-        FILT_INIT_OUT_VAL       => 2347483,
+        FILT_INIT_OUT_VAL       => 2**11,
         FILT_OUT_OFFSET         => 2**21,
-        FILT_OUT_VAL_LIMIT      => 2**22,
+        FILT_OUT_LIMIT          => 2**22,
         LD_LOCK_N               => 20,
         LD_ULOCK_N              => 16,
         LD_LOCK_LIMIT           => 100

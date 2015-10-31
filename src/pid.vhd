@@ -35,7 +35,7 @@ begin
         variable step           : std_logic;
         variable setpoint_err   : signed(BITS_N - 1 downto 0);
         variable prop           : signed(BITS_N + 2 downto 0);
-        variable integral       : signed(BITS_N + 2 downto 0);
+        variable integ          : signed(BITS_N + 2 downto 0);
         variable sum            : signed(BITS_N + 2 downto 0);
         variable last_state     : std_logic;
     begin
@@ -43,7 +43,8 @@ begin
             step := '0';
             pid_out <= to_signed(INIT_OUT_VAL, pid_out'length);
             setpoint_err := (others => '0');
-            integral := (others => '0');
+            integ := (others => '0');
+            prop := (others => '0');
             sum := (others => '0');
             last_state := '0';
         elsif rising_edge(clk) then
@@ -56,27 +57,28 @@ begin
                     prop := shift_left(resize(setpoint_err, prop'length)
                                 , P_SHIFT_N);
                 end if;
-                integral := integral + setpoint_err;
                 -- Stop integrating to precent windup
-                if integral > 2**(integral'length - 1) - 1 then
-                    integral := to_signed(2**(integral'length - 1) - 1
-                        , integral'length);
-                elsif integral < -2**(integral'length - 1) - 1 then
-                    integral := to_signed(-2**(integral'length - 1) - 1
-                        , integral'length);
+                if integ + setpoint_err >= 2**(integ'length - 2) - 1 then
+                    integ := to_signed(2**(integ'length - 2) - 1
+                        , integ'length);
+                elsif integ + setpoint_err <= -2**(integ'length - 2) + 1 then
+                    integ := to_signed(-2**(integ'length - 2) + 1
+                        , integ'length);
+                else
+                    integ := integ + setpoint_err;
                 end if;
                 if I_SHIFT_N < 0 then
-                    sum := prop + shift_right(integral, -I_SHIFT_N);
+                    sum := prop + shift_right(integ, -I_SHIFT_N);
                 else
-                    sum := prop + shift_left(integral, I_SHIFT_N);
-                end if;
-                if sum > 2**pid_out'length - 1 then
-                    sum := to_signed(2**(pid_out'length) - 1, sum'length);
-                elsif sum < -2**pid_out'length - 1 then
-                    sum := to_signed(-2**(pid_out'length) - 1, sum'length);
+                    sum := prop + shift_left(integ, I_SHIFT_N);
                 end if;
                 step := '1';
             elsif step = '1' then
+                if sum >= 2**(pid_out'length - 1) - 1 then
+                    sum := to_signed(2**(pid_out'length - 1) - 1, sum'length);
+                elsif sum <= -2**(pid_out'length - 1) + 1 then
+                    sum := to_signed(-2**(pid_out'length - 1) + 1, sum'length);
+                end if;
                 pid_out <= resize(sum, pid_out'length);
                 step := '0';
             end if;

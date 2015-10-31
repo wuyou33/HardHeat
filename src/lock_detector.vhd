@@ -18,7 +18,7 @@ entity lock_detector is
     (
         clk                     : in std_logic;
         reset                   : in std_logic;
-        phase_time_in           : in signed(PHASE_TIME_IN_N downto 0);
+        phase_time_in           : in signed(PHASE_TIME_IN_N - 1 downto 0);
         lock_out                : out std_logic
     );
 end entity;

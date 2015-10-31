@@ -12,11 +12,11 @@ entity hardheat is
     generic
     (
         TDC_N               : positive;
-        FILT_P_SHIFT_N      : natural;
-        FILT_I_SHIFT_N      : natural;
+        FILT_P_SHIFT_N      : integer;
+        FILT_I_SHIFT_N      : integer;
         FILT_INIT_OUT_VAL   : positive;
         FILT_OUT_OFFSET     : natural;
-        FILT_OUT_VAL_LIMIT  : positive;
+        FILT_OUT_LIM        : positive;
         ACCUM_BITS_N        : positive;
         ACCUM_WORD_N        : positive;
         DT_N                : positive;
@@ -30,9 +30,9 @@ entity hardheat is
         TEMP_PWM_N          : positive;
         TEMP_PWM_MIN_LVL    : natural;
         TEMP_PWM_EN_ON_D    : natural;
-        TEMP_P_SHIFT_N      : natural;
-        TEMP_I_SHIFT_N      : natural;
-        TEMP_PID_IN_OFFSET  : integer
+        TEMP_P_SHIFT_N      : integer;
+        TEMP_I_SHIFT_N      : integer;
+        TEMP_SETPOINT       : integer
     );
     port
     (
@@ -75,7 +75,7 @@ begin
         FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
         FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
         FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
-        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
+        FILT_OUT_LIMIT      => FILT_OUT_LIM,
         ACCUM_BITS_N        => ACCUM_BITS_N,
         ACCUM_WORD_N        => ACCUM_WORD_N,
         LD_LOCK_N           => LD_LOCK_N,
@@ -131,7 +131,7 @@ begin
         PWM_EN_ON_D         => TEMP_PWM_EN_ON_D,
         P_SHIFT_N           => TEMP_P_SHIFT_N,
         I_SHIFT_N           => TEMP_I_SHIFT_N,
-        PID_IN_OFFSET       => TEMP_PID_IN_OFFSET
+        TEMP_SETPOINT       => TEMP_SETPOINT
     )
     port map
     (

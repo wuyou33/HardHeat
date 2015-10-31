@@ -14,15 +14,15 @@ entity hardheat_top is
         -- Number of bits in time-to-digital converter
         TDC_N               : positive      := 12;
         -- Number of bitshifts to left for the filter proportional coefficient
-        FILT_P_SHIFT_N      : natural       := 7;
+        FILT_P_SHIFT_N      : integer       := 0;
         -- Number of bitshifts to right for the filter integral coefficient
-        FILT_I_SHIFT_N      : natural       := 0;
+        FILT_I_SHIFT_N      : integer       := -5;
         -- Initial output value from the filter
-        FILT_INIT_OUT_VAL   : positive      := 2347483;
+        FILT_INIT_OUT_VAL   : positive      := 2**11 - 1;
         -- Filter output offset
         FILT_OUT_OFFSET     : natural       := 2**21;
         -- Filter output value clamping limit
-        FILT_OUT_VAL_LIMIT  : positive      := 2347483;
+        FILT_OUT_LIM        : positive      := 2**22;
         -- Number of bits in the phase accumulator
         ACCUM_BITS_N        : positive      := 32;
         -- Number of bits in the tuning word for the phase accumulator
@@ -50,11 +50,11 @@ entity hardheat_top is
         -- Output maximum duty cycle on enable, measured in PWM cycles!
         TEMP_PWM_EN_ON_D    : natural       := 100000;
         -- Number of bitshifts to left for the PID-filter proportional coeff
-        TEMP_P_SHIFT_N      : natural       := 4;
+        TEMP_P_SHIFT_N      : integer       := 4;
         -- Number of bitshifts to right for the PID-filter integral coeff
-        TEMP_I_SHIFT_N      : natural       := 11;
+        TEMP_I_SHIFT_N      : integer       := -11;
         -- PID input offset applied to the temperature sensor output
-        TEMP_PID_IN_OFFSET  : integer       := -320;
+        TEMP_SETPOINT       : integer       := 320;
         DEBOUNCE_D          : natural       := 1000000;
         DEBOUNCE_FF_N       : natural       := 5
     );
@@ -86,10 +86,12 @@ architecture hardheat_arch_top of hardheat_top is
     attribute keep of clk           : signal is true;
     signal temp                     : signed(16 - 1 downto 0);
     signal temp_f                   : std_logic;
+    attribute keep of temp          : signal is true;
+    attribute keep of temp_f        : signal is true;
     attribute noprune of temp       : signal is true;
     attribute noprune of temp_f     : signal is true;
     attribute preserve of temp      : signal is true;
-    attribute preserve of temp_f    : signal is true;
+    --attribute preserve of temp_f    : signal is true;
     signal pll_clk                  : std_logic;
     signal pll_locked               : std_logic;
     signal reset                    : std_logic;
@@ -155,7 +157,7 @@ begin
         FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
         FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
         FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
-        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
+        FILT_OUT_LIM        => FILT_OUT_LIM,
         ACCUM_BITS_N        => ACCUM_BITS_N,
         ACCUM_WORD_N        => ACCUM_WORD_N,
         LD_LOCK_N           => LD_LOCK_N,
@@ -171,7 +173,7 @@ begin
         TEMP_PWM_EN_ON_D    => TEMP_PWM_EN_ON_D,
         TEMP_P_SHIFT_N      => TEMP_P_SHIFT_N,
         TEMP_I_SHIFT_N      => TEMP_I_SHIFT_N,
-        TEMP_PID_IN_OFFSET  => TEMP_PID_IN_OFFSET
+        TEMP_SETPOINT       => TEMP_SETPOINT
     )
     port map
     (

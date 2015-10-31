@@ -14,7 +14,7 @@ entity tdc is
         reset           : in std_logic;
         up_in           : in std_logic;
         down_in         : in std_logic;
-        time_out        : out signed(COUNTER_N downto 0);
+        time_out        : out signed(COUNTER_N - 1 downto 0);
         sig_or_out      : out std_logic;
         sign_out        : out std_logic
 );
@@ -29,7 +29,7 @@ begin
         variable last_up    : std_logic;
         variable last_down  : std_logic;
         variable sign       : std_logic;
-        variable count      : signed(COUNTER_N downto 0);
+        variable count      : signed(COUNTER_N - 1 downto 0);
     begin
         if reset = '1' then
             time_out <= (others => '0');
@@ -39,6 +39,7 @@ begin
             last_down := '0';
             sign := '0';
             sign_out <= sign;
+            sig_or := '0';
         elsif rising_edge(clk) then
             if not up_in = last_up and up_in = '1' then
                 sign := '0';

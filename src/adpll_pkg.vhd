@@ -6,11 +6,11 @@ package adpll_pkg is
         generic
         (
             TDC_N               : positive;
-            FILT_P_SHIFT_N      : natural;
-            FILT_I_SHIFT_N      : natural;
+            FILT_P_SHIFT_N      : integer;
+            FILT_I_SHIFT_N      : integer;
             FILT_INIT_OUT_VAL   : positive;
             FILT_OUT_OFFSET     : natural;
-            FILT_OUT_VAL_LIMIT  : positive;
+            FILT_OUT_LIMIT      : natural;
             ACCUM_BITS_N        : positive;
             ACCUM_WORD_N        : positive;
             LD_LOCK_N           : positive;

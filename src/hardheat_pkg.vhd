@@ -7,11 +7,11 @@ package hardheat_pkg is
         generic
         (
             TDC_N               : positive;
-            FILT_P_SHIFT_N      : natural;
-            FILT_I_SHIFT_N      : natural;
+            FILT_P_SHIFT_N      : integer;
+            FILT_I_SHIFT_N      : integer;
             FILT_INIT_OUT_VAL   : positive;
             FILT_OUT_OFFSET     : natural;
-            FILT_OUT_VAL_LIMIT  : positive;
+            FILT_OUT_LIM        : positive;
             ACCUM_BITS_N        : positive;
             ACCUM_WORD_N        : positive;
             DT_N                : positive;
@@ -25,9 +25,9 @@ package hardheat_pkg is
             TEMP_PWM_N          : positive;
             TEMP_PWM_MIN_LVL    : natural;
             TEMP_PWM_EN_ON_D    : natural;
-            TEMP_P_SHIFT_N      : natural;
-            TEMP_I_SHIFT_N      : natural;
-            TEMP_PID_IN_OFFSET  : integer
+            TEMP_P_SHIFT_N      : integer;
+            TEMP_I_SHIFT_N      : integer;
+            TEMP_SETPOINT       : integer
         );
         port
         (

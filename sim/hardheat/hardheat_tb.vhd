@@ -9,11 +9,11 @@ entity hardheat_tb is
     generic
     (
         TDC_N               : positive      := 12;
-        FILT_P_SHIFT_N      : natural       := 7;
-        FILT_I_SHIFT_N      : natural       := 0;
-        FILT_INIT_OUT_VAL   : positive      := 2347483;
+        FILT_P_SHIFT_N      : integer       := 0;
+        FILT_I_SHIFT_N      : integer       := -5;
+        FILT_INIT_OUT_VAL   : positive      := 2**11 - 1;
         FILT_OUT_OFFSET     : natural       := 2**21;
-        FILT_OUT_VAL_LIMIT  : positive      := 2**22;
+        FILT_OUT_LIM        : positive      := 2**22;
         ACCUM_BITS_N        : positive      := 32;
         ACCUM_WORD_N        : positive      := 23;
         DT_N                : positive      := 16;
@@ -27,9 +27,9 @@ entity hardheat_tb is
         TEMP_PWM_N          : positive      := 12;
         TEMP_PWM_MIN_LVL    : natural       := 2**12 / 5;
         TEMP_PWM_EN_ON_D    : natural       := 2000000;
-        TEMP_P_SHIFT_N      : natural       := 4;
-        TEMP_I_SHIFT_N      : natural       := 11;
-        TEMP_PID_IN_OFFSET  : integer       := -320
+        TEMP_P_SHIFT_N      : integer       := 4;
+        TEMP_I_SHIFT_N      : integer       := -11;
+        TEMP_SETPOINT       : integer       := 320
     );
 end entity;
 
@@ -80,7 +80,7 @@ begin
         FILT_I_SHIFT_N      => FILT_I_SHIFT_N,
         FILT_INIT_OUT_VAL   => FILT_INIT_OUT_VAL,
         FILT_OUT_OFFSET     => FILT_OUT_OFFSET,
-        FILT_OUT_VAL_LIMIT  => FILT_OUT_VAL_LIMIT,
+        FILT_OUT_LIM        => FILT_OUT_LIM,
         ACCUM_BITS_N        => ACCUM_BITS_N,
         ACCUM_WORD_N        => ACCUM_WORD_N,
         LD_LOCK_N           => LD_LOCK_N,
@@ -96,7 +96,7 @@ begin
         TEMP_PWM_EN_ON_D    => TEMP_PWM_EN_ON_D,
         TEMP_P_SHIFT_N      => TEMP_P_SHIFT_N,
         TEMP_I_SHIFT_N      => TEMP_I_SHIFT_N,
-        TEMP_PID_IN_OFFSET  => TEMP_PID_IN_OFFSET
+        TEMP_SETPOINT       => TEMP_SETPOINT
     )
     port map
     (
@@ -157,7 +157,7 @@ begin
             mod_lvl_v := to_unsigned(4, mod_lvl_v'length);
             mod_lvl <= mod_lvl_v;
             cycle_count := (others => '0');
-            last_state := sig;
+            last_state := '0';
             mod_lvl_f <= '0';
         elsif rising_edge(clk) then
             if mod_lvl_f = '1' then

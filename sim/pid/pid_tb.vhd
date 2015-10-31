@@ -25,7 +25,7 @@ begin
     generic map
     (
         P_SHIFT_N           => 4,
-        I_SHIFT_N           => 2,
+        I_SHIFT_N           => -2,
         BITS_N              => 16,
         INIT_OUT_VAL        => 0
     )

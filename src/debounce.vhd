@@ -28,7 +28,7 @@ begin
 
 	timer_set <= flipflops(flipflops'high) xor flipflops(flipflops'high - 1);
 
-	process(clk)
+	process(clk, reset)
 	begin
         if reset = '1' then
             flipflops <= (others => '0');
