@@ -7,30 +7,24 @@ use work.utils_pkg.all;
 entity pid is
     generic
     (
-        -- Proportional coefficient, input value multiplied by 2^P_SHIFT_N
-        P_SHIFT_N           : natural;
-        -- Integral coefficient, cumulative error multiplied by 2^-I_SHIFT_N
-        I_SHIFT_N           : natural;
-        -- Number of bits in the input of the filter (signed)
-        IN_N                : positive;
-        -- Number of output bits (unsigned)
-        OUT_N               : positive;
-        -- Initial value for the tuning word after reset
-        INIT_OUT_VAL        : natural;
-        -- Offset for the in value
-        IN_OFFSET           : integer;
-        -- Offset for the output value
-        OUT_OFFSET          : natural;
-        -- Output value limit
-        OUT_VAL_LIMIT       : positive
+        -- Coefficients are shifted left is positive and right if negative
+        -- Proportional coefficient
+        P_SHIFT_N           : integer;
+        -- Integral coefficient
+        I_SHIFT_N           : integer;
+        -- Number of bits in the filter
+        BITS_N              : positive;
+        -- Initial output value
+        INIT_OUT_VAL        : natural
     );
     port
     (
         clk                 : in std_logic;
         reset               : in std_logic;
         upd_clk_in          : in std_logic;
-        pid_in              : in signed(IN_N downto 0);
-        pid_out             : out unsigned(OUT_N - 1 downto 0)
+        setpoint_in         : in signed(BITS_N - 1 downto 0);
+        pid_in              : in signed(BITS_N - 1 downto 0);
+        pid_out             : out signed(BITS_N - 1 downto 0)
     );
 end entity;
 
@@ -39,44 +33,51 @@ begin
 
     pid_p: process(clk, reset)
         variable step           : std_logic;
-        -- Size variable so that the biggest possible value fits
-        variable prop           : signed(ceil_log2(2**IN_N * 2**P_SHIFT_N)
-			downto 0);
-        variable shift_in       : signed(IN_N downto 0);
-        variable integral       : signed(OUT_N downto 0);
-        variable sum            : signed(OUT_N downto 0);
-        variable temp_out       : unsigned(OUT_N - 1 downto 0);
+        variable setpoint_err   : signed(BITS_N - 1 downto 0);
+        variable prop           : signed(BITS_N + 2 downto 0);
+        variable integral       : signed(BITS_N + 2 downto 0);
+        variable sum            : signed(BITS_N + 2 downto 0);
         variable last_state     : std_logic;
     begin
         if reset = '1' then
             step := '0';
-            pid_out <= to_unsigned(INIT_OUT_VAL, pid_out'length);
-            prop := (others => '0');
+            pid_out <= to_signed(INIT_OUT_VAL, pid_out'length);
+            setpoint_err := (others => '0');
             integral := (others => '0');
+            sum := (others => '0');
             last_state := '0';
         elsif rising_edge(clk) then
             if not upd_clk_in = last_state and upd_clk_in = '1' then
-                -- Limit shifted value to positive
-                if pid_in + to_signed(IN_OFFSET, pid_in'length) < 0 then
-                    shift_in := to_signed(0, shift_in'length);
+                setpoint_err := setpoint_in - pid_in;
+                if P_SHIFT_N < 0 then
+                    prop := shift_right(resize(setpoint_err, prop'length)
+                                , -P_SHIFT_N);
                 else
-                    shift_in := pid_in + to_signed(IN_OFFSET, pid_in'length);
+                    prop := shift_left(resize(setpoint_err, prop'length)
+                                , P_SHIFT_N);
                 end if;
-                prop := shift_left(resize(shift_in, prop'length), P_SHIFT_N);
-                integral := integral + resize(shift_in, integral'length);
-                sum := resize(prop, sum'length)
-                    + shift_right(integral, I_SHIFT_N);
+                integral := integral + setpoint_err;
+                -- Stop integrating to precent windup
+                if integral > 2**(integral'length - 1) - 1 then
+                    integral := to_signed(2**(integral'length - 1) - 1
+                        , integral'length);
+                elsif integral < -2**(integral'length - 1) - 1 then
+                    integral := to_signed(-2**(integral'length - 1) - 1
+                        , integral'length);
+                end if;
+                if I_SHIFT_N < 0 then
+                    sum := prop + shift_right(integral, -I_SHIFT_N);
+                else
+                    sum := prop + shift_left(integral, I_SHIFT_N);
+                end if;
+                if sum > 2**pid_out'length - 1 then
+                    sum := to_signed(2**(pid_out'length) - 1, sum'length);
+                elsif sum < -2**pid_out'length - 1 then
+                    sum := to_signed(-2**(pid_out'length) - 1, sum'length);
+                end if;
                 step := '1';
             elsif step = '1' then
-                -- Strip sign bit, add offset and limit value
-                temp_out := unsigned(std_logic_vector(
-                    sum(sum'high - 1 downto 0)))
-                    + to_unsigned(OUT_OFFSET, pid_out'length);
-                if temp_out > OUT_VAL_LIMIT then
-                    pid_out <= to_unsigned(OUT_VAL_LIMIT, OUT_N);
-                else
-                    pid_out <= temp_out;
-                end if;
+                pid_out <= resize(sum, pid_out'length);
                 step := '0';
             end if;
             last_state := upd_clk_in;

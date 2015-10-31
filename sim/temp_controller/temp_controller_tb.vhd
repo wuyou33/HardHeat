@@ -43,7 +43,7 @@ begin
         PWM_MIN_LVL         => 2**12 / 4,
         PWM_EN_ON_D         => 100,
         P_SHIFT_N           => 4,
-        I_SHIFT_N           => 11,
+        I_SHIFT_N           => -11,
         TEMP_SETPOINT       => 320
     )
     port map

@@ -17,8 +17,8 @@ entity temp_controller is
         PWM_N               : positive;
         PWM_MIN_LVL         : positive;
         PWM_EN_ON_D         : natural;
-        P_SHIFT_N           : natural;
-        I_SHIFT_N           : natural;
+        P_SHIFT_N           : integer;
+        I_SHIFT_N           : integer;
         TEMP_SETPOINT       : integer
     );
     port
