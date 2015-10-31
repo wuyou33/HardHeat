@@ -18,6 +18,7 @@ HardHeat currently consists of:
     - 1-wire controller, read temperature from a DS18B20 sensor
     - PID-controller
     - PWM-controller for a fan, with start-up max. duty cycle delay and min. duty cycle limit
+    - RPM counter with fault detection (for fans or water flow sensors)
 
 This GitHub repository contains all the required components and the associated test benches for each component. Also ModelSim project files and waveform setup scripts are included.
 

@@ -15,7 +15,7 @@ end entity;
 architecture epdm_tb_arch of epdm_tb is
 
     -- Main clock frequency 100 MHz
-    constant CLK_PERIOD     : time := 1 sec / 20e7;
+    constant CLK_PERIOD     : time := 1 sec / 10e7;
 
     signal clk              : std_logic := '0';
     signal reset            : std_logic;
