@@ -24,21 +24,18 @@ begin
     DUT_inst: pid
     generic map
     (
-        P_SHIFT_N           => 11,
-        I_SHIFT_N           => 3,
-        IN_N                => 11,
-        OUT_N               => 22,
-        INIT_OUT_VAL        => 2**22 / 2 - 1,
-        IN_OFFSET           => 0,
-        OUT_OFFSET          => 0,
-        OUT_VAL_LIMIT       => 2**22 - 1
+        P_SHIFT_N           => 4,
+        I_SHIFT_N           => 2,
+        BITS_N              => 16,
+        INIT_OUT_VAL        => 0
     )
     port map
     (
         clk                 => clk,
         reset               => reset,
         upd_clk_in          => upd,
-        pid_in              => to_signed(2**10, 12)
+        setpoint_in         => to_signed(0, 16),
+        pid_in              => to_signed(100, 16)
     );
 
     reset <= '1', '0' after 500 ns;

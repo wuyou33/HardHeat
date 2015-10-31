@@ -17,7 +17,7 @@ package temp_controller_pkg is
             PWM_EN_ON_D         : natural;
             P_SHIFT_N           : natural;
             I_SHIFT_N           : natural;
-            PID_IN_OFFSET       : integer
+            TEMP_SETPOINT       : integer
         );
         port
         (

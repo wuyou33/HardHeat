@@ -19,7 +19,7 @@ entity temp_controller is
         PWM_EN_ON_D         : natural;
         P_SHIFT_N           : natural;
         I_SHIFT_N           : natural;
-        PID_IN_OFFSET       : integer
+        TEMP_SETPOINT       : integer
     );
     port
     (
@@ -47,11 +47,28 @@ architecture temp_controller_arch of temp_controller is
     signal err_id           : unsigned(1 downto 0);
     signal crc              : std_logic_vector(8 - 1 downto 0);
     signal pwm_enable       : std_logic;
-    signal mod_lvl          : unsigned(PWM_N - 1 downto 0);
-    signal mod_lvl_f        : std_logic;
     signal temp             : signed(16 - 1 downto 0);
     signal temp_f           : std_logic;
+    signal pid_out          : signed(temp'range);
+    signal mod_lvl          : unsigned(PWM_N - 1 downto 0);
+    signal mod_lvl_f        : std_logic;
     signal conv             : std_logic;
+
+    function trunc_to_unsigned(arg : signed) return unsigned is
+    begin
+        return unsigned(std_logic_vector(arg));
+    end function;
+
+    function clamp_to_unsigned(arg : signed) return unsigned is
+        variable res        : unsigned(arg'high - 1 downto 0);
+    begin
+        -- Shift value so it is always positive
+        res := trunc_to_unsigned(resize(arg + to_signed(2**(arg'length - 1) - 1
+                , arg'length)
+                , res'length));
+        return res;
+    end function;
+
 begin
 
     temp_out <= temp;
@@ -128,21 +145,23 @@ begin
     (
         P_SHIFT_N           => P_SHIFT_N,
         I_SHIFT_N           => I_SHIFT_N,
-        IN_N                => temp'high,
-        OUT_N               => PWM_N,
-        INIT_OUT_VAL        => 0,
-        IN_OFFSET           => PID_IN_OFFSET,
-        OUT_OFFSET          => 0,
-        OUT_VAL_LIMIT       => 2**PWM_N - 1
+        BITS_N              => temp'length,
+        INIT_OUT_VAL        => 0
     )
     port map
     (
         clk                 => clk,
         reset               => reset,
         upd_clk_in          => temp_f,
+        setpoint_in         => to_signed(TEMP_SETPOINT, temp'length),
         pid_in              => temp,
-        pid_out             => mod_lvl
+        pid_out             => pid_out
     );
+
+    -- Invert, clamp and scale PID output for PWM controller input
+    mod_lvl <= resize(shift_right(clamp_to_unsigned(-pid_out)
+                , pid_out'length - mod_lvl'length)
+                , mod_lvl'length);
 
     pwm_p: pwm
     generic map
