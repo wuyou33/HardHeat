@@ -44,7 +44,7 @@ begin
         PWM_EN_ON_D         => 100,
         P_SHIFT_N           => 4,
         I_SHIFT_N           => 11,
-        PID_IN_OFFSET       => -320
+        TEMP_SETPOINT       => 320
     )
     port map
     (

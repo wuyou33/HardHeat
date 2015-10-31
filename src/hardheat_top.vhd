@@ -47,8 +47,8 @@ entity hardheat_top is
         TEMP_PWM_N          : positive      := 12;
         -- Minimum PWM level (duty cycle)
         TEMP_PWM_MIN_LVL    : natural       := 2**12 / 5;
-        -- Delay for outputting maximum duty cycle on enable
-        TEMP_PWM_EN_ON_D    : natural       := 200000000;
+        -- Output maximum duty cycle on enable, measured in PWM cycles!
+        TEMP_PWM_EN_ON_D    : natural       := 100000;
         -- Number of bitshifts to left for the PID-filter proportional coeff
         TEMP_P_SHIFT_N      : natural       := 4;
         -- Number of bitshifts to right for the PID-filter integral coeff
