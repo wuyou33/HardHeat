@@ -13,7 +13,7 @@ entity hardheat_tb is
         FILT_I_SHIFT_N      : natural       := 0;
         FILT_INIT_OUT_VAL   : positive      := 2347483;
         FILT_OUT_OFFSET     : natural       := 2**21;
-        FILT_OUT_VAL_LIMIT  : positive      := 2347483;
+        FILT_OUT_VAL_LIMIT  : positive      := 2**22;
         ACCUM_BITS_N        : positive      := 32;
         ACCUM_WORD_N        : positive      := 23;
         DT_N                : positive      := 16;
@@ -38,7 +38,7 @@ architecture hardheat_arch_tb of hardheat_tb is
     -- Clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
     -- Reference signal frequency 50 kHz
-    constant REF_PERIOD     : time := 1 sec / 50e3;
+    constant REF_PERIOD     : time := 1 sec / 90e3;
 
     signal clk              : std_logic := '0';
     signal reset            : std_logic;

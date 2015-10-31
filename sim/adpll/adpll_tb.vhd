@@ -11,8 +11,8 @@ architecture adpll_tb_arch of adpll_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD         : time := 1 sec / 10e7;
-    -- Reference signal frequency 45 kHz
-    constant REF_PERIOD         : time := 1 sec / 45e3;
+    -- Reference signal frequency 50 kHz
+    constant REF_PERIOD         : time := 1 sec / 90e3;
 
     signal clk                  : std_logic := '0';
     signal reset                : std_logic;
@@ -28,9 +28,9 @@ begin
         FILT_I_SHIFT_N          => 0,
         ACCUM_BITS_N            => 32,
         ACCUM_WORD_N            => 23,
-        FILT_INIT_OUT_VAL       => (2**22 - 1) / 4,
+        FILT_INIT_OUT_VAL       => 2347483,
         FILT_OUT_OFFSET         => 2**21,
-        FILT_OUT_VAL_LIMIT      => 2547483,
+        FILT_OUT_VAL_LIMIT      => 2**22,
         LD_LOCK_N               => 20,
         LD_ULOCK_N              => 16,
         LD_LOCK_LIMIT           => 100
