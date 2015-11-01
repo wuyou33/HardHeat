@@ -16,4 +16,5 @@ sim/*
 sim/*/*
 !sim/*/
 !sim/*/*.mpf
+!sim/*/*.vhd
 !sim/*/*.do
