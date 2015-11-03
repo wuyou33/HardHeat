@@ -29,7 +29,8 @@ package temp_controller_pkg is
             temp_out            : out signed(16 - 1 downto 0);
             temp_out_f          : out std_logic;
             temp_error_out      : out std_logic;
-            pwm_out             : out std_logic
+            pwm_out             : out std_logic;
+            ow_pullup_out       : out std_logic
         );
     end component;
 end package;

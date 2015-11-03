@@ -12,6 +12,7 @@ set_false_path -to [get_ports sig_rl_out]
 set_false_path -to [get_ports lock_out]
 set_false_path -to [get_ports pwm_out]
 set_false_path -to [get_ports temp_err_out]
+set_false_path -to [get_ports ow_pullup_out]
 derive_pll_clocks
 
 # JTAG signal constraints, needed for SignalTap

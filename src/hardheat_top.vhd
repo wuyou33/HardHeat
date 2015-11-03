@@ -67,6 +67,7 @@ entity hardheat_top is
         ow_in               : in std_logic;
         mod_lvl_in          : in std_logic_vector(2 downto 0);
         ow_out              : out std_logic;
+        ow_pullup_out       : out std_logic;
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
         sig_rh_out          : out std_logic;
@@ -190,6 +191,7 @@ begin
         lock_out            => lock_out,
         ow_in               => ow_in,
         ow_out              => ow_out,
+        ow_pullup_out       => ow_pullup_out,
         temp_out            => temp,
         temp_out_f          => temp_f,
         temp_err_out        => temp_err_out,

@@ -15,6 +15,7 @@ add wave -noupdate /ds18b20_tb/DUT_inst/temp_out_f
 add wave -noupdate /ds18b20_tb/DUT_inst/temp_error_out
 add wave -noupdate /ds18b20_tb/ow_out
 add wave -noupdate /ds18b20_tb/ow_in
+add wave -noupdate /ds18b20_tb/DUT_inst/pullup_out
 add wave -noupdate /ds18b20_tb/DUT_inst/error_in
 add wave -noupdate /ds18b20_tb/DUT_inst/error_id_in
 add wave -noupdate /ds18b20_tb/DUT_inst/crc_in

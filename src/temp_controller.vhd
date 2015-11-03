@@ -31,7 +31,8 @@ entity temp_controller is
         temp_out            : out signed(16 - 1 downto 0);
         temp_out_f          : out std_logic;
         temp_error_out      : out std_logic;
-        pwm_out             : out std_logic
+        pwm_out             : out std_logic;
+        ow_pullup_out       : out std_logic
     );
 end entity;
 
@@ -114,7 +115,8 @@ begin
         temp_out            => temp,
         temp_out_f          => temp_f,
         crc_in              => crc,
-        temp_error_out      => temp_error_out
+        temp_error_out      => temp_error_out,
+        pullup_out          => ow_pullup_out
     );
 
     ow_p: one_wire

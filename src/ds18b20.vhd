@@ -31,7 +31,8 @@ entity ds18b20 is
         -- Temperature output and associated strobe
         temp_out                : out signed(16 - 1 downto 0);
         temp_out_f              : out std_logic;
-        temp_error_out          : out std_logic
+        temp_error_out          : out std_logic;
+        pullup_out              : out std_logic
     );
 end entity;
 
@@ -57,15 +58,16 @@ begin
             next_cmd := conv_cmd;
             reset_ow_out <= '0';
             busy_state := '0';
+            data := (others => (others => '0'));
+            bytes_left := (others => '0');
+            timer := (others => '0');
             receive_data_out_f <= '0';
             data_out <= (others => '0');
             data_out_f <= '0';
             temp_out <= (others => '0');
             temp_out_f <= '0';
-            data := (others => (others => '0'));
-            bytes_left := (others => '0');
             temp_error_out <= '0';
-            timer := (others => '0');
+            pullup_out <= '1';
         elsif rising_edge(clk) then
             if state = idle then
                 temp_out_f <= '0';
@@ -84,6 +86,7 @@ begin
                 reset_ow_out <= '0';
                 -- Reset error flag
                 temp_error_out <= '0';
+                pullup_out <= '1';
                 state := wait_busy;
                 next_state := reset_error;
             elsif state = reset_error then
@@ -106,6 +109,7 @@ begin
                 next_state := conv_delay;
             elsif state = conv_delay then
                 data_out_f <= '0';
+                pullup_out <= '0';
                 if timer < CONV_DELAY_VAL then
                     timer := timer + 1;
                 else

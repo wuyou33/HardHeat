@@ -44,6 +44,7 @@ entity hardheat is
         mod_lvl_in_f        : in std_logic;
         ow_in               : in std_logic;
         ow_out              : out std_logic;
+        ow_pullup_out       : out std_logic;
         sig_out             : out std_logic;
         sig_lh_out          : out std_logic;
         sig_ll_out          : out std_logic;
@@ -143,7 +144,8 @@ begin
         temp_out_f          => temp_out_f,
         pwm_out             => pwm_out,
         enable_in           => '1',
-        temp_error_out      => temp_err_out
+        temp_error_out      => temp_err_out,
+        ow_pullup_out       => ow_pullup_out
     );
 
     sig_lh_out <= sig_lh and not deadtime;

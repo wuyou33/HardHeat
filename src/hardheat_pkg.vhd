@@ -39,6 +39,7 @@ package hardheat_pkg is
             mod_lvl_in_f        : in std_logic;
             ow_in               : in std_logic;
             ow_out              : out std_logic;
+            ow_pullup_out       : out std_logic;
             sig_out             : out std_logic;
             sig_lh_out          : out std_logic;
             sig_ll_out          : out std_logic;

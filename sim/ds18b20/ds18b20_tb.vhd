@@ -40,6 +40,7 @@ architecture ds18b20_tb_arch of ds18b20_tb is
     signal temp_f           : std_logic;
     signal temp_error       : std_logic;
     signal crc              : std_logic_vector(8 - 1 downto 0);
+    signal pullup           : std_logic;
 
     -- Signals internal to the test bench
     signal conv             : std_logic;
@@ -110,7 +111,8 @@ begin
         temp_out            => temp,
         temp_out_f          => temp_f,
         crc_in              => crc,
-        temp_error_out      => temp_error
+        temp_error_out      => temp_error,
+        pullup_out          => pullup
     );
 
     ow_p: one_wire
@@ -150,5 +152,9 @@ begin
         temp_in             => signed(TEST_TEMP),
         temp_in_f           => '0'
     );
+
+    -- Make sure pullup is not active when bus is pulled low
+    assert not (ow_out = '0' and pullup = '0')
+        report "Pullup active when bus pulled down!" severity warning;
 
 end;
