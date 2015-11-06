@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.resonant_pfd_pkg.all;
 
 entity resonant_pfd_tb is
 end entity;
 
-architecture resonant_pfd_tb_arch of resonant_pfd_tb is
+architecture rtl of resonant_pfd_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD         : time := 1 sec / 10e7;
@@ -23,7 +22,7 @@ architecture resonant_pfd_tb_arch of resonant_pfd_tb is
 
 begin
 
-    DUT_inst: resonant_pfd
+    DUT_inst: entity work.resonant_pfd(rtl)
     port map
     (
         clk                 => clk,

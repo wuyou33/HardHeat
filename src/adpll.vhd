@@ -2,11 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.resonant_pfd_pkg.all;
-use work.tdc_pkg.all;
-use work.pid_pkg.all;
-use work.phase_accumulator_pkg.all;
-use work.lock_detector_pkg.all;
 
 entity adpll is
     generic
@@ -33,7 +28,8 @@ entity adpll is
     );
 end entity;
 
-architecture adpll_arch of adpll is
+architecture rtl of adpll is
+
     signal up               : std_logic;
     signal down             : std_logic;
     signal pid_out          : signed(TDC_N - 1 downto 0);
@@ -64,11 +60,12 @@ architecture adpll_arch of adpll is
             return arg;
         end if;
     end function;
+
 begin
 
     sig_out                 <= sig;
 
-    pfd_p: resonant_pfd
+    pfd_p: entity work.resonant_pfd(rtl)
     port map
     (
         clk                 => clk,
@@ -79,7 +76,7 @@ begin
         down_out            => down
     );
 
-    tdc_p: tdc
+    tdc_p: entity work.tdc(rtl)
     generic map
     (
         COUNTER_N           => TDC_N
@@ -93,7 +90,7 @@ begin
         time_out            => phase_time
     );
 
-    filter_p: pid
+    filter_p: entity work.pid(rtl)
     generic map
     (
         P_SHIFT_N           => FILT_P_SHIFT_N,
@@ -118,7 +115,7 @@ begin
                         , tuning_word'length)
                         , FILT_OUT_LIMIT);
 
-    phase_accumulator_p: phase_accumulator
+    phase_accumulator_p: entity work.phase_accumulator(rtl)
     generic map
     (
         ACCUM_BITS_N        => ACCUM_BITS_N,
@@ -132,7 +129,7 @@ begin
         sig_out             => sig
     );
 
-    lock_detector_p: lock_detector
+    lock_detector_p: entity work.lock_detector(rtl)
     generic map
     (
         PHASE_TIME_IN_N     => TDC_N,

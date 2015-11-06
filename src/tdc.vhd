@@ -6,30 +6,30 @@ entity tdc is
     generic
     (
         -- Number of bits in the counter
-        COUNTER_N       : positive
+        COUNTER_N               : positive
     );
     port
     (
-        clk             : in std_logic;
-        reset           : in std_logic;
-        up_in           : in std_logic;
-        down_in         : in std_logic;
-        time_out        : out signed(COUNTER_N - 1 downto 0);
-        sig_or_out      : out std_logic;
-        sign_out        : out std_logic
+        clk                     : in std_logic;
+        reset                   : in std_logic;
+        up_in                   : in std_logic;
+        down_in                 : in std_logic;
+        time_out                : out signed(COUNTER_N - 1 downto 0);
+        sig_or_out              : out std_logic;
+        sign_out                : out std_logic
 );
 end tdc;
 
-architecture tdc_arch of tdc is
+architecture rtl of tdc is
 begin
 
     tdc_p: process(clk, reset)
-        variable sig_or     : std_logic;
-        variable last_or    : std_logic;
-        variable last_up    : std_logic;
-        variable last_down  : std_logic;
-        variable sign       : std_logic;
-        variable count      : signed(COUNTER_N - 1 downto 0);
+        variable sig_or         : std_logic;
+        variable last_or        : std_logic;
+        variable last_up        : std_logic;
+        variable last_down      : std_logic;
+        variable sign           : std_logic;
+        variable count          : signed(COUNTER_N - 1 downto 0);
     begin
         if reset = '1' then
             time_out <= (others => '0');
@@ -41,6 +41,7 @@ begin
             sign_out <= sign;
             sig_or := '0';
         elsif rising_edge(clk) then
+
             if not up_in = last_up and up_in = '1' then
                 sign := '0';
                 sign_out <= sign;
@@ -52,6 +53,7 @@ begin
             last_down := down_in;
             sig_or := up_in or down_in;
             sig_or_out <= sig_or;
+
             -- Count when the or signal is high
             if sig_or = '1' then
                 count := count + 1;

@@ -2,7 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.phase_accumulator_pkg.all;
 
 entity phase_accumulator_tb is
     generic
@@ -12,7 +11,7 @@ entity phase_accumulator_tb is
     );
 end entity;
 
-architecture phase_accumulator_tb_arch of phase_accumulator_tb is
+architecture rtl of phase_accumulator_tb is
 
     -- Clock frequency is 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e8;
@@ -24,7 +23,7 @@ architecture phase_accumulator_tb_arch of phase_accumulator_tb is
 
 begin
 
-    DUT_inst: phase_accumulator
+    DUT_inst: entity work.phase_accumulator(rtl)
     generic map
     (
         ACCUM_BITS_N    => ACCUM_BITS_N,

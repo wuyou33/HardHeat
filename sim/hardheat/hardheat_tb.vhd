@@ -2,8 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.hardheat_pkg.all;
-use work.ds18b20_data_gen_pkg.all;
 
 entity hardheat_tb is
     generic
@@ -33,7 +31,7 @@ entity hardheat_tb is
     );
 end entity;
 
-architecture hardheat_arch_tb of hardheat_tb is
+architecture rtl of hardheat_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -72,7 +70,7 @@ begin
         ref <= not ref after REF_PERIOD / 2;
     end process;
 
-    DUT_inst: hardheat
+    DUT_inst: entity work.hardheat(rtl)
     generic map
     (
         TDC_N               => TDC_N,
@@ -116,7 +114,7 @@ begin
         temp_out_f          => temp_out_f
     );
 
-    data_gen_p: ds18b20_data_gen
+    data_gen_p: entity work.ds18b20_data_gen(rtl)
     generic map
     (
         MICROSECOND_D       => TEMP_OW_US_D
@@ -160,9 +158,11 @@ begin
             last_state := '0';
             mod_lvl_f <= '0';
         elsif rising_edge(clk) then
+
             if mod_lvl_f = '1' then
                 mod_lvl_f <= '0';
             end if;
+
             if not sig = last_state and sig = '1' then
                 cycle_count := cycle_count + 1;
                 -- Increase pulse density every 12 rising edges

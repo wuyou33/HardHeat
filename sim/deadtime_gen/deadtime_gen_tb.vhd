@@ -2,8 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.deadtime_gen_pkg.all;
-use work.phase_accumulator_pkg.all;
 
 entity deadtime_gen_tb is
     generic
@@ -12,7 +10,7 @@ entity deadtime_gen_tb is
     );
 end entity;
 
-architecture deadtime_gen_tb_arch of deadtime_gen_tb is
+architecture rtl of deadtime_gen_tb is
 
     constant CLK_PERIOD     : time := 1 sec / 20e7;
 
@@ -23,7 +21,7 @@ architecture deadtime_gen_tb_arch of deadtime_gen_tb is
 
 begin
 
-    DUT_inst: deadtime_gen
+    DUT_inst: entity work.deadtime_gen(rtl)
     generic map
     (
         DT_N                => 16,
@@ -36,7 +34,7 @@ begin
         sig_in              => sig
     );
 
-    sig_gen_p: phase_accumulator
+    sig_gen_p: entity work.phase_accumulator(rtl)
     generic map
     (
         ACCUM_BITS_N        => 32,

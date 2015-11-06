@@ -2,10 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.one_wire_pkg.all;
-use work.ds18b20_pkg.all;
-use work.pid_pkg.all;
-use work.pwm_pkg.all;
 use work.utils_pkg.all;
 
 entity temp_controller is
@@ -36,7 +32,8 @@ entity temp_controller is
     );
 end entity;
 
-architecture temp_controller_arch of temp_controller is
+architecture rtl of temp_controller is
+
     signal reset_ow         : std_logic;
     signal data_in          : std_logic_vector(8 - 1 downto 0);
     signal data_in_f        : std_logic;
@@ -93,7 +90,7 @@ begin
         end if;
     end process;
 
-    ds18b20_p: ds18b20
+    ds18b20_p: entity work.ds18b20(rtl)
     generic map
     (
         CONV_DELAY_VAL      => CONV_CMD_D
@@ -119,7 +116,7 @@ begin
         pullup_out          => ow_pullup_out
     );
 
-    ow_p: one_wire
+    ow_p: entity work.one_wire(rtl)
     generic map
     (
         US_D                => OW_US_D
@@ -142,7 +139,7 @@ begin
         crc_out             => crc
     );
 
-    pid_p: pid
+    pid_p: entity work.pid(rtl)
     generic map
     (
         P_SHIFT_N           => P_SHIFT_N,
@@ -165,7 +162,7 @@ begin
                 , pid_out'length - mod_lvl'length)
                 , mod_lvl'length);
 
-    pwm_p: pwm
+    pwm_p: entity work.pwm(rtl)
     generic map
     (
         COUNTER_N           => PWM_N,

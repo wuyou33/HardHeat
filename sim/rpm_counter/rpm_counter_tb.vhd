@@ -2,7 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.rpm_counter_pkg.all;
 
 entity rpm_counter_tb is
     generic
@@ -13,7 +12,7 @@ entity rpm_counter_tb is
     );
 end entity;
 
-architecture rpm_counter_tb_arch of rpm_counter_tb is
+architecture rtl of rpm_counter_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -32,7 +31,7 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
-    DUT_inst: rpm_counter
+    DUT_inst: entity work.rpm_counter(rtl)
     generic map
     (
         BITS_N              => BITS_N,

@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.tdc_pkg.all;
 
 entity tdc_tb is
 end entity;
 
-architecture tdc_tb_arch of tdc_tb is
+architecture rtl of tdc_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD         : time := 1 sec / 10e7;
@@ -23,7 +22,7 @@ architecture tdc_tb_arch of tdc_tb is
 
 begin
 
-    DUT_inst: tdc
+    DUT_inst: entity work.tdc(rtl)
     generic map
     (
         COUNTER_N       => 12

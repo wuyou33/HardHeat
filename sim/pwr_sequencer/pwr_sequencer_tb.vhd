@@ -2,7 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.pwr_sequencer_pkg.all;
 
 entity pwr_sequencer_tb is
     generic
@@ -12,7 +11,7 @@ entity pwr_sequencer_tb is
     );
 end entity;
 
-architecture pwr_sequencer_tb_arch of pwr_sequencer_tb is
+architecture rtl of pwr_sequencer_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -34,7 +33,7 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
-    DUT_inst: pwr_sequencer
+    DUT_inst: entity work.pwr_sequencer(rtl)
     generic map
     (
         LEVELS_N            => LEVELS_N
@@ -63,6 +62,7 @@ begin
             cur_level := 0;
             start <= '0';
         elsif rising_edge(clk) then
+
             if state = idle then
                 start <= '1';
                 for i in 0 to enable'high loop
@@ -71,6 +71,7 @@ begin
                         state := delay;
                     end if;
                 end loop;
+
             elsif state = delay then
                 timer := timer + 1;
                 if timer > TEST_D then
@@ -82,6 +83,7 @@ begin
                         state := idle;
                     end if;
                 end if;
+
             elsif state = power_on then
                 timer := timer + 1;
                 -- After succesfull sequencing cause a failure
@@ -90,6 +92,7 @@ begin
                     timer := 0;
                     state := cause_fail;
                 end if;
+
             elsif state = cause_fail then
                 timer := timer + 1;
                 start <= '0';

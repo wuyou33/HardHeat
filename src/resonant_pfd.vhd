@@ -5,18 +5,20 @@ entity resonant_pfd is
     port
     (
         -- Inputs
-        clk             : in std_logic;
-        reset           : in std_logic;
-        sig_in          : in std_logic;
-        ref_in          : in std_logic;
+        clk                 : in std_logic;
+        reset               : in std_logic;
+        sig_in              : in std_logic;
+        ref_in              : in std_logic;
         -- Outputs
-        up_out          : out std_logic;
-        down_out        : out std_logic
+        up_out              : out std_logic;
+        down_out            : out std_logic
     );
 end resonant_pfd;
 
-architecture resonant_pfd_arch of resonant_pfd is
-    signal ff           : std_logic;
+architecture rtl of resonant_pfd is
+
+    signal ff               : std_logic;
+
 begin
 
     -- D-type flip-flop

@@ -1,10 +1,11 @@
 library ieee;
 library work;
 use ieee.std_logic_1164.all;
-use work.pwr_sequencer_pkg.all;
 use work.utils_pkg.all;
+use work.status_t_pkg.all;
 
 entity pwr_sequencer is
+
     generic
     (
         LEVELS_N                : positive
@@ -22,11 +23,13 @@ entity pwr_sequencer is
     );
 end entity;
 
-architecture pwr_sequencer_arch of pwr_sequencer is
+architecture rtl of pwr_sequencer is
 begin
 
     pwr_sequencer_p: process(clk, reset)
+
         type state_t is (idle, sequencing, power_on, power_fail);
+
         variable state              : state_t;
         variable level_num          : natural;
         variable fail_states        : std_logic_vector(LEVELS_N - 1 downto 0);
@@ -44,6 +47,7 @@ begin
             main_pwr_en_out <= '0';
             main_pwr_fail_out <= '0';
         elsif rising_edge(clk) then
+
             if state = idle then
                 level_num := 0;
                 en_out <= (others => '0');
@@ -54,6 +58,7 @@ begin
                     state := sequencing;
                     main_pwr_fail_out <= '0';
                 end if;
+
             elsif state = sequencing then
                 -- Enable sequencing level
                 en_out(level_num) <= '1';
@@ -71,6 +76,7 @@ begin
                         main_pwr_en_out <= '1';
                     end if;
                 end if;
+
             elsif state = power_on then
                 -- Detect rising edges on fail inputs
                 for i in 0 to fail_in'high loop
@@ -82,6 +88,7 @@ begin
                         main_pwr_fail_out <= '1';
                     end if;
                 end loop;
+
             elsif state = power_fail then
                 -- Restart sequencing
                 if not last_start_state = start_in and start_in = '0' then

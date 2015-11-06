@@ -19,8 +19,10 @@ entity phase_accumulator is
     );
 end entity;
 
-architecture phase_accumulator_arch of phase_accumulator is
+architecture rtl of phase_accumulator is
+
     signal accumulator  : unsigned (ACCUM_BITS_N - 1 downto 0);
+
 begin
 
     accumulate: process(clk, reset)

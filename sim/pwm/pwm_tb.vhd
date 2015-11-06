@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.pwm_pkg.all;
 
 entity pwm_tb is
 end entity;
 
-architecture pwm_tb_arch of pwm_tb is
+architecture rtl of pwm_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -29,7 +28,7 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
-    DUT_inst: pwm
+    DUT_inst: entity work.pwm(rtl)
     generic map
     (
         COUNTER_N           => 12,

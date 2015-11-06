@@ -2,8 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.epdm_pkg.all;
-use work.phase_accumulator_pkg.all;
 
 entity epdm_tb is
     generic
@@ -12,7 +10,7 @@ entity epdm_tb is
     );
 end entity;
 
-architecture epdm_tb_arch of epdm_tb is
+architecture rtl of epdm_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -29,7 +27,7 @@ architecture epdm_tb_arch of epdm_tb is
 
 begin
 
-    DUT_inst: epdm
+    DUT_inst: entity work.epdm(rtl)
     port map
     (
         clk                 => clk,
@@ -43,7 +41,7 @@ begin
         sig_rl_out          => sig_rl
     );
 
-    sig_gen_p: phase_accumulator
+    sig_gen_p: entity work.phase_accumulator(rtl)
     generic map
     (
         ACCUM_BITS_N        => 32,
@@ -77,11 +75,14 @@ begin
             last_state := sig;
             mod_lvl_f <= '0';
         elsif rising_edge(clk) then
+
             if mod_lvl_f = '1' then
                 mod_lvl_f <= '0';
             end if;
+
             if not sig = last_state and sig = '1' then
                 cycle_count := cycle_count + 1;
+
                 -- Increase pulse density every 12 rising edges
                 if cycle_count = 12 then
                     cycle_count := (others => '0');

@@ -22,7 +22,7 @@ entity ds18b20_data_gen is
     );
 end entity;
 
-architecture ds18b20_data_gen_arch of ds18b20_data_gen is
+architecture rtl of ds18b20_data_gen is
 
     subtype data_t is std_logic_vector(8 - 1 downto 0);
 

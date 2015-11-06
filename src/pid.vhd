@@ -28,7 +28,7 @@ entity pid is
     );
 end entity;
 
-architecture pid_arch of pid is
+architecture rtl of pid is
 begin
 
     pid_p: process(clk, reset)
@@ -48,6 +48,7 @@ begin
             sum := (others => '0');
             last_state := '0';
         elsif rising_edge(clk) then
+
             if not upd_clk_in = last_state and upd_clk_in = '1' then
                 setpoint_err := setpoint_in - pid_in;
                 if P_SHIFT_N < 0 then
@@ -73,6 +74,7 @@ begin
                     sum := prop + shift_left(integ, I_SHIFT_N);
                 end if;
                 step := '1';
+
             elsif step = '1' then
                 if sum >= 2**(pid_out'length - 1) - 1 then
                     sum := to_signed(2**(pid_out'length - 1) - 1, sum'length);

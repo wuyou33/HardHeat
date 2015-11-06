@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.adpll_pkg.all;
 
 entity adpll_tb is
 end entity;
 
-architecture adpll_tb_arch of adpll_tb is
+architecture rtl of adpll_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD         : time := 1 sec / 10e7;
@@ -20,7 +19,7 @@ architecture adpll_tb_arch of adpll_tb is
 
 begin
 
-    DUT_inst: adpll
+    DUT_inst: entity work.adpll(rtl)
     generic map
     (
         TDC_N                   => 13,

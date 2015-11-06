@@ -25,7 +25,7 @@ entity pwm is
     );
 end entity;
 
-architecture pwm_arch of pwm is
+architecture rtl of pwm is
 begin
 
     pwm_p: process(clk, reset)
@@ -42,6 +42,7 @@ begin
             mod_lvl := to_unsigned(MIN_MOD_LVL, mod_lvl'length);
             pwm_out <= '0';
         elsif rising_edge(clk) then
+
             if state = idle then
                 pwm_out <= '0';
                 if enable_in = '1' then
@@ -50,6 +51,7 @@ begin
                     cycles := (others => '0');
                     pwm_out <= '1';
                 end if;
+
             elsif state = enable_on_delay then
                 if timer = 2**COUNTER_N - 1 then
                     cycles := cycles + 1;
@@ -58,6 +60,7 @@ begin
                         timer := (others => '0');
                     end if;
                 end if;
+
             elsif state = pwm then
                 if timer <= mod_lvl then
                     pwm_out <= '1';
@@ -65,12 +68,14 @@ begin
                     pwm_out <= '0';
                 end if;
             end if;
+
             if enable_in = '0' then
                 state := idle;
                 timer := (others => '0');
             else
                 timer := timer + 1;
             end if;
+
             if mod_lvl_f_in = '1' then
                 if mod_lvl_in < MIN_MOD_LVL then
                     mod_lvl := to_unsigned(MIN_MOD_LVL, mod_lvl'length);

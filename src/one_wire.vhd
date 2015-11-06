@@ -38,8 +38,9 @@ entity one_wire is
     );
 end entity;
 
-architecture one_wire_arch of one_wire is
-        -- One wire bus delay values in clock cycles
+architecture rtl of one_wire is
+
+    -- One wire bus delay values in clock cycles
     constant RESET_ON_D     : positive  := US_D * 480;
     constant RESET_SAMPLE_D : positive  := US_D * 70;
     constant RESET_D        : positive  := US_D * 410;
@@ -59,6 +60,7 @@ architecture one_wire_arch of one_wire is
     signal last_bit         : std_logic;
     signal last_bit_f       : std_logic;
     signal crc_reset        : std_logic;
+
 begin
 
     -- Invert and combine signals so application logic matches bus state
@@ -73,6 +75,7 @@ begin
             error_out <= '0';
             error_id_out <= (others => '0');
         elsif rising_edge(clk) then
+
             if err_no_dev = '1' then
                 error_id_out <= to_unsigned(1, error_id_out'length);
                 error_out <= '1';
@@ -95,6 +98,7 @@ begin
             busy_reset <= '0';
             ow_reset_out <= '1';
         elsif rising_edge(clk) then
+
             if state = idle then
                 if reset_ow = '1' then
                     state := reset_on;
@@ -103,6 +107,7 @@ begin
                 else
                     busy_reset <= '0';
                 end if;
+
             elsif state = reset_on then
                 if timer < RESET_ON_D then
                     timer := timer + 1;
@@ -112,6 +117,7 @@ begin
                     state := reset_sample;
                     timer := (others => '0');
                 end if;
+
             elsif state = reset_sample then
                 if timer < RESET_SAMPLE_D then
                     timer := timer + 1;
@@ -125,6 +131,7 @@ begin
                     state := reset_delay;
                     timer := (others => '0');
                 end if;
+
             elsif state = reset_delay then
                 if timer < RESET_D then
                     timer := timer + 1;
@@ -153,6 +160,7 @@ begin
             data := (others => '0');
             data_left := (others => '0');
         elsif rising_edge(clk) then
+
             if state = idle then
                 -- Bus always released when idle
                 ow_send_out <= '1';
@@ -167,6 +175,7 @@ begin
                 else
                     busy_send <= '0';
                 end if;
+
             elsif state = tx_one_low then
                 if timer < TX_ONE_LOW_D then
                     timer := timer + 1;
@@ -176,6 +185,7 @@ begin
                     state := tx_one_high;
                     timer := (others => '0');
                 end if;
+
             elsif state = tx_one_high then
                 if timer < TX_ONE_HIGH_D then
                     timer := timer + 1;
@@ -183,6 +193,7 @@ begin
                     state := tx_next_bit;
                     timer := (others => '0');
                 end if;
+
             elsif state = tx_zero_low then
                 if timer < TX_ZERO_LOW_D then
                     timer := timer + 1;
@@ -191,6 +202,7 @@ begin
                     state := tx_zero_high;
                     timer := (others => '0');
                 end if;
+
             elsif state = tx_zero_high then
                 if timer < TX_ZERO_HIGH_D then
                     timer := timer + 1;
@@ -198,6 +210,7 @@ begin
                     state := tx_next_bit;
                     timer := (others => '0');
                 end if;
+
             elsif state = tx_next_bit then
                 if data_left = 0 then
                     state := idle;

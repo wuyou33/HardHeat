@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.one_wire_pkg.all;
 
 entity one_wire_tb is
 end entity;
 
-architecture one_wire_tb_arch of one_wire_tb is
+architecture rtl of one_wire_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -38,7 +37,7 @@ begin
     -- Invert the output signal coming from the 1-wire module for display
     ow_out <= not ow_n_out;
 
-    DUT_inst: one_wire
+    DUT_inst: entity work.one_wire(rtl)
     generic map
     (
         US_D                => 100

@@ -2,13 +2,12 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.temp_controller_pkg.all;
-use work.ds18b20_data_gen_pkg.all;
 
 entity temp_controller_tb is
 end entity;
 
-architecture temp_controller_tb_arch of temp_controller_tb is
+architecture rtl of temp_controller_tb is
+
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
 
@@ -22,6 +21,7 @@ architecture temp_controller_tb_arch of temp_controller_tb is
     signal temp             : signed(16 - 1 downto 0);
     signal temp_f           : std_logic;
     signal temp_out_f       : std_logic;
+
 begin
 
     reset <= '1', '0' after 500 ns;
@@ -33,7 +33,7 @@ begin
         clk <= not clk after CLK_PERIOD / 2;
     end process;
 
-    DUT_inst: temp_controller
+    DUT_inst: entity work.temp_controller(rtl)
     generic map
     (
         CONV_D              => 1000000,
@@ -56,7 +56,7 @@ begin
         temp_out_f          => temp_out_f
     );
 
-    data_gen_p: ds18b20_data_gen
+    data_gen_p: entity work.ds18b20_data_gen(rtl)
     generic map
     (
         MICROSECOND_D       => MICROSECOND_D

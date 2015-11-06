@@ -3,14 +3,11 @@ library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.utils_pkg.all;
-use work.ds18b20_pkg.all;
-use work.one_wire_pkg.all;
-use work.ds18b20_data_gen_pkg.all;
 
 entity ds18b20_tb is
 end entity;
 
-architecture ds18b20_tb_arch of ds18b20_tb is
+architecture rtl of ds18b20_tb is
 
     -- Main clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -88,7 +85,7 @@ begin
         end if;
     end process;
 
-    DUT_inst: ds18b20
+    DUT_inst: entity work.ds18b20(rtl)
     generic map
     (
         -- Use a small 1ms conversion delay to not make simulation take long
@@ -115,7 +112,7 @@ begin
         pullup_out          => pullup
     );
 
-    ow_p: one_wire
+    ow_p: entity work.one_wire(rtl)
     generic map
     (
         US_D                => 100
@@ -138,7 +135,7 @@ begin
         crc_out             => crc
     );
 
-    data_gen: ds18b20_data_gen
+    data_gen: entity work.ds18b20_data_gen(rtl)
     generic map
     (
         MICROSECOND_D       => 100

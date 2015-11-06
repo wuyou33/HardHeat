@@ -2,10 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.adpll_pkg.all;
-use work.epdm_pkg.all;
-use work.deadtime_gen_pkg.all;
-use work.temp_controller_pkg.all;
 use work.utils_pkg.all;
 
 entity hardheat is
@@ -58,7 +54,8 @@ entity hardheat is
     );
 end entity;
 
-architecture hardheat_arch of hardheat is
+architecture rtl of hardheat is
+
     signal sig              : std_logic;
     signal deadtime         : std_logic;
     signal deadtime_n       : std_logic;
@@ -66,9 +63,10 @@ architecture hardheat_arch of hardheat is
     signal sig_ll           : std_logic;
     signal sig_rh           : std_logic;
     signal sig_rl           : std_logic;
+
 begin
 
-    adpll_p: adpll
+    adpll_p: entity work.adpll(rtl)
     generic map
     (
         TDC_N               => TDC_N,
@@ -92,7 +90,7 @@ begin
         lock_out            => lock_out
     );
 
-    epdm_p: epdm
+    epdm_p: entity work.epdm(rtl)
     port map
     (
         clk                 => clk,
@@ -106,7 +104,7 @@ begin
         sig_rl_out          => sig_rl
     );
 
-    deadtime_gen_p: deadtime_gen
+    deadtime_gen_p: entity work.deadtime_gen(rtl)
     generic map
     (
         DT_N                => DT_N,
@@ -121,7 +119,7 @@ begin
         sig_n_out           => deadtime_n
     );
 
-    temp_controller_p: temp_controller
+    temp_controller_p: entity work.temp_controller(rtl)
     generic map
     (
         CONV_D              => TEMP_CONV_D,

@@ -20,7 +20,7 @@ entity epdm is
     );
 end entity;
 
-architecture epdm_arch of epdm is
+architecture rtl of epdm is
 begin
 
     epdm_p: process(clk, reset)
@@ -39,17 +39,21 @@ begin
             alternate := '0';
             skip := '1';
         elsif rising_edge(clk) then
+
             -- New modulation level, reset counter
             if mod_lvl_in_f = '1' then
                 count := (others => '0');
             end if;
+
             if not sig_in = last_state then
+
                 -- Count on rising and falling edge
                 if sig_in = '1' then
                     count := count + 1;
                 elsif sig_in = '0' then
                     count := count + 1;
                 end if;
+
                 -- Skip every sixth cycle
                 if to_integer(mod_lvl_in) = 3 then
                     if count = 6 then
@@ -57,6 +61,7 @@ begin
                     else
                         skip := '0';
                     end if;
+
                 -- Skip every fourth cycle
                 elsif to_integer(mod_lvl_in) = 2 then
                     if count mod 4 = 0 then
@@ -64,6 +69,7 @@ begin
                     else
                         skip := '0';
                     end if;
+
                 -- Skip every second cycle
                 elsif to_integer(mod_lvl_in) = 1 then
                     if count mod 2 = 0 then
@@ -71,6 +77,7 @@ begin
                     else
                         skip := '0';
                     end if;
+
                 -- Skip every cycle except every fourth
                 elsif to_integer(mod_lvl_in) = 0 then
                     if not (count mod 4 = 2) then
@@ -78,10 +85,12 @@ begin
                     else
                         skip := '0';
                     end if;
+
                 -- No skipping, full power
                 else
                     skip := '0';
                 end if;
+
                 -- Reset counter
                 if count = 12 then
                     -- Alternate switch pairs so one pair is not constantly on
@@ -91,6 +100,8 @@ begin
                     count := (others => '0');
                 end if;
             end if;
+
+            -- Apply skipping
             if skip = '1' then
                 sig_lh_out <= '0';
                 sig_ll_out <= '1';

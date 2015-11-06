@@ -20,10 +20,12 @@ entity debounce is
 	);
 end entity;
 
-architecture debounce_arch of debounce is
+architecture rtl of debounce is
+
     signal flipflops        : std_logic_vector(FLIPFLOPS_N - 1 downto 0);
 	signal timer_set		: std_logic;
 	signal timer    		: unsigned(ceil_log2(DEBOUNCE_D) downto 0);
+
 begin
 
 	timer_set <= flipflops(flipflops'high) xor flipflops(flipflops'high - 1);

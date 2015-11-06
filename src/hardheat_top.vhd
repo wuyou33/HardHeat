@@ -4,8 +4,6 @@ library altera;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.altera_pll_top_pkg.all;
-use work.hardheat_pkg.all;
-use work.debounce_pkg.all;
 use altera.altera_syn_attributes.all;
 
 entity hardheat_top is
@@ -78,7 +76,8 @@ entity hardheat_top is
     );
 end entity;
 
-architecture hardheat_arch_top of hardheat_top is
+architecture rtl_top of hardheat_top is
+
     attribute noprune               : boolean;
     attribute preserve              : boolean;
     attribute keep                  : boolean;
@@ -92,13 +91,13 @@ architecture hardheat_arch_top of hardheat_top is
     attribute noprune of temp       : signal is true;
     attribute noprune of temp_f     : signal is true;
     attribute preserve of temp      : signal is true;
-    --attribute preserve of temp_f    : signal is true;
     signal pll_clk                  : std_logic;
     signal pll_locked               : std_logic;
     signal reset                    : std_logic;
     signal mod_lvl                  : std_logic_vector(mod_lvl_in'range);
     signal mod_lvl_f                : std_logic;
     signal debounced_sws            : std_logic_vector(mod_lvl_in'range);
+
 begin
 
     -- Main clock from PLL on the SoCkit board
@@ -116,7 +115,7 @@ begin
 
     -- Read modulation level state from switches, debounce
     debouncing_p: for i in 0 to mod_lvl_in'high generate
-    debouncer_p: debounce
+    debouncer_p: entity work.debounce(rtl)
     generic map
     (
         DEBOUNCE_D          => DEBOUNCE_D,
@@ -150,7 +149,7 @@ begin
     end process;
 
     -- TODO: Sig is internally connected!
-    hardheat_p: hardheat
+    hardheat_p: entity work.hardheat(rtl)
     generic map
     (
         TDC_N               => TDC_N,

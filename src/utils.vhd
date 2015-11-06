@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 package utils_pkg is
+
 	function log2(Arg : natural) return natural;
 	function ceil_log2(Arg : natural) return natural;
     function shift_right_vec(Arg : std_logic_vector; Num : positive)
@@ -17,9 +18,11 @@ package utils_pkg is
                                 Num : positive;
                                 NewBit : std_logic)
         return std_logic_vector;
+
 end package;
 
 package body utils_pkg is
+
 	---------------------------------------------------------------------------
 	-- Function for calculating the base-2 logarithm
 	---------------------------------------------------------------------------
@@ -33,6 +36,7 @@ package body utils_pkg is
 		end loop;
 		return ret_val;
 	end function;
+
 	---------------------------------------------------------------------------
 	-- Function for calculating the minimum number of bits to represent Arg
 	---------------------------------------------------------------------------
@@ -47,6 +51,7 @@ package body utils_pkg is
 			return(RetVal);
 		end if;
 	end function;
+
 	---------------------------------------------------------------------------
 	-- Shift an std_logic_vector right
 	---------------------------------------------------------------------------
@@ -55,6 +60,7 @@ package body utils_pkg is
     begin
         return(std_logic_vector(shift_right(unsigned(Arg), Num)));
     end function;
+
 	---------------------------------------------------------------------------
 	-- Shift an std_logic_vector left
 	---------------------------------------------------------------------------
@@ -63,6 +69,7 @@ package body utils_pkg is
     begin
         return(std_logic_vector(shift_left(unsigned(Arg), Num)));
     end function;
+
 	---------------------------------------------------------------------------
 	-- Shift an std_logic_vector right and put new bit to 'high
 	---------------------------------------------------------------------------
@@ -75,6 +82,7 @@ package body utils_pkg is
         vec(vec'high) := NewBit;
         return(vec);
     end function;
+
 	---------------------------------------------------------------------------
 	-- Shift an std_logic_vector left and put new bit to 'low
 	---------------------------------------------------------------------------
@@ -87,4 +95,5 @@ package body utils_pkg is
         vec(vec'low) := NewBit;
         return(vec);
     end function;
+
 end package body;

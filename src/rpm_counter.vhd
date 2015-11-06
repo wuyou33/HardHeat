@@ -2,7 +2,6 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.debounce_pkg.all;
 
 entity rpm_counter is
     generic
@@ -22,22 +21,22 @@ entity rpm_counter is
     );
 end entity;
 
-architecture rpm_counter_arch of rpm_counter is
+architecture rtl of rpm_counter is
     signal rpm                  : std_logic;
 begin
 
-    debounce_p: debounce
+    debounce_p: entity work.debounce(rtl)
 	generic map
 	(
-		DEBOUNCE_D			=> DEBOUNCE_D,
-        FLIPFLOPS_N         => 5
+		DEBOUNCE_D			    => DEBOUNCE_D,
+        FLIPFLOPS_N             => 5
 	)
 	port map
 	(
-		clk					=> clk,
-        reset               => reset,
-		sig_in				=> rpm_in,
-		sig_out				=> rpm
+		clk					    => clk,
+        reset                   => reset,
+		sig_in				    => rpm_in,
+		sig_out				    => rpm
 	);
 
     rpm_p: process(clk, reset)
@@ -52,12 +51,14 @@ begin
             last_state := '0';
         elsif rising_edge(clk) then
             rpm_out_f <= '0';
+
             -- Indicate a fault if counter reaches maximum value
             if counter = 2**counter'length - 1 then
                 fault_out <= '1';
             else
                 counter := counter + 1;
             end if;
+
             if not rpm = last_state and rpm = '1' then
                 if counter > MIN_RPM_LIM then
                    fault_out <= '1';

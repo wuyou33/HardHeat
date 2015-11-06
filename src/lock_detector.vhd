@@ -23,7 +23,7 @@ entity lock_detector is
     );
 end entity;
 
-architecture lock_detector_arch of lock_detector is
+architecture rtl of lock_detector is
 begin
 
     lock_detector_p: process(clk, reset)

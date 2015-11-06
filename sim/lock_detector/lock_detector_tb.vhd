@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.lock_detector_pkg.all;
 
 entity lock_detector_tb is
 end entity;
 
-architecture lock_detector_tb_arch of lock_detector_tb is
+architecture rtl of lock_detector_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD     : time := 1 sec / 10e7;
@@ -17,7 +16,7 @@ architecture lock_detector_tb_arch of lock_detector_tb is
 
 begin
 
-    DUT_inst: lock_detector
+    DUT_inst: entity work.lock_detector(rtl)
     generic map
     (
         PHASE_TIME_IN_N     => 12,

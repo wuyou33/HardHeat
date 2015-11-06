@@ -20,7 +20,7 @@ entity deadtime_gen is
     );
 end entity;
 
-architecture deadtime_gen_arch of deadtime_gen is
+architecture rtl of deadtime_gen is
 begin
 
     dt_gen_p: process(clk, reset)

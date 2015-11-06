@@ -2,12 +2,11 @@ library ieee;
 library work;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.pid_pkg.all;
 
 entity pid_tb is
 end entity;
 
-architecture pid_tb_arch of pid_tb is
+architecture rtl of pid_tb is
 
     -- Clock frequency 100 MHz
     constant CLK_PERIOD         : time := 1 sec / 10e7;
@@ -21,7 +20,7 @@ architecture pid_tb_arch of pid_tb is
 
 begin
 
-    DUT_inst: pid
+    DUT_inst: entity work.pid(rtl)
     generic map
     (
         P_SHIFT_N           => 4,
